@@ -9,7 +9,7 @@
  *       if it is null/undefined/empty etc. It will flag red once it is, giving file name and estimate line number.
  * Author : Bernard Sibanda
  * Date : 16-07-2023
- * URL : 
+ * URL : https://github.com/besiwims/jimba.git
  * Company : Tobb Technologies Pty Ltd
  * License : MIT
  * How to use it : 
