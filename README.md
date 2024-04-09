@@ -1,3 +1,45 @@
+Jimba or j is a console.log wrapper library which eliminates the following problems and j.js solutions:
+
+1.  Repeated addition and removal
+Console.log usage always requires removing and adding it back as per need.
+
+j.js does not require removal because it can be turned off to  speed up the page functioning.
+
+2. It is clumsy
+Web page is often blotted with console.logs which cannot be disable and often times needs removal which is cumbersome when the page is big.
+
+j.js is neat because one only adds it at the end of line with variable being logged.
+
+3. Speed estimate
+Console.log does not profile the page execution.
+
+j.js has basic working execution profiling.
+
+4.  Too long to write
+Console.log is a tool but is too long to write. Something short is better.
+
+j.js function is one letter function. e.g. j({variablename}), o({variablename})
+
+The above 2 functions j and o will call console.log and also produce the variable null status and also tell the argument name passed on to the function when it was being called.
+
+5. Builtin testing
+
+Console.log lacks built in null/empty/false value testing. These often surfance during runtime and are hard to detect.
+
+j.js runs tests for each variable and displays not only errors but also the total errors.
+
+Why j.js instead of jimba.js?
+
+j.js is an upgrade of jimba.js.  Both work the same. j.js uses two functions j() and o(). o() function is for console logging objects.
+
+Other advantages of jimba
+
+Write js code and have builtin null variable testing on the frontend without other difficult to learn testing libraries.
+
+Improvements:
+
+One improvements needed is to log these jimba results to a server.
+
 # jimba JECT
 
  * Title : Jimba Extended Consolelog Tool -> JECT
