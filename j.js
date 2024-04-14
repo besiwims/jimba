@@ -1,23 +1,31 @@
 export let TOTAL_FAIL = 0;
 export let TOTAL_PASS = 0;
-export const _R  = !0;
+export const  _R  = 0;
+let _F = 0;
+export const _FUNCTIONS =[];
 
-export function o(o)
-{  
-    if (_R)
+function off(r)
+{
+    if(r)
     {
-        const name = Object.keys(o)[0];
-        console.warn(name,o)
-        return
-    }
-    else
-    {
-        //
-    }
+        _F = 0;
+    } 
 }
 
 export function j(o, r,g=false,gOff=false)
 {
+    let g_ = r;
+
+    if(r)
+    {
+        _F = !0;
+
+        const name = Object.keys(o)[0];
+        const value = Object.values(o)[0];
+
+        r = value
+        o = name
+    }
     if(!r)
     {
         const name = Object.keys(o)[0];
@@ -26,13 +34,14 @@ export function j(o, r,g=false,gOff=false)
         r = value
         o = name
     }
-    
-    if (_R)
+
+    if (_R || _F)
     {
 
         if(Array.isArray(o))
         {
-            console.log(o) 
+            console.log(o);
+            off(g_);
             return
         }
         if(g)
@@ -44,11 +53,13 @@ export function j(o, r,g=false,gOff=false)
             {
                 if(typeof o == 'object')
                 {
-                    console.log(o) 
+                    console.log(o) ;
+                    off(g_);
                     return
                 }
                 else
                 {
+                    off(g_);
                     return console.warn(o,r)
                 }               
                
@@ -57,7 +68,8 @@ export function j(o, r,g=false,gOff=false)
         {
             if(typeof o == 'object')
             {
-                console.log(o) 
+                console.log(o) ;
+                off(g_);
                 return
             }
             else
@@ -86,9 +98,37 @@ export function j(o, r,g=false,gOff=false)
     }
 }
 
-export function tS(title="JIMBA")
+export function o(o,r=false)
+{ 
+    if(r)
+    {
+        _F = !0;
+    }
+     
+    if (_R || _F)
+    {
+        const name = Object.keys(o)[0];
+        console.warn(name,o)
+        return
+    }
+    else
+    {
+        //
+    }
+}
+
+
+let tS_ = false;
+
+export function tS(title="JIMBA",k=false)
 {
-    if(title)
+
+    if(k == true)
+    {
+        tS_ = true;
+    }   
+ 
+    if(title && (_R || tS_))
     {
         console.time("TIME : "+title.toUpperCase());       
     }
@@ -96,20 +136,39 @@ export function tS(title="JIMBA")
 
 export function tE(title="JIMBA")
 {
-    if(title)
+    if(title && (_R || tS_))
     {
+        _FUNCTIONS.push(title);
+
         console.timeEnd("TIME : "+title.toUpperCase());
 
         console.log("%cTOTAL_ERRORS : " + TOTAL_FAIL,"background-color:#fff;color:darkred;");
 
-         console.log("%cTOTAL_PASSES : " + TOTAL_PASS,"background-color:#fff;color:blue;");
+        console.log("%cTOTAL_PASSES : " + TOTAL_PASS,"background-color:#fff;color:blue;");
+
+        tS_ = !0;
+        
     }
 }
 
 export function fails(){
+    if(_R || tS_)
     console.log("%cTOTAL_ERRORS : " + TOTAL_FAIL,"background-color:#fff;color:darkred;");
 }
 
 export function passes(){
+    if(_R || tS_)
     console.log("%cTOTAL_PASSES : " + TOTAL_PASS,"background-color:#fff;color:blue;");
 }
+
+export function funcs(){
+    if(_R || tS_)
+    {
+        const fT = _FUNCTIONS.length;
+        console.log("%cTOTAL_FUNCTIONS : " + fT,"background-color:#fff;color:purple;");
+        const funcs_ = _FUNCTIONS.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
+        console.log(funcs_);
+    }
+
+}
+
