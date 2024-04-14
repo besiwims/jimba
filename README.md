@@ -1,3 +1,7 @@
+Examples 
+
+![image](https://github.com/besiwims/jimba/assets/44117539/afa8a8bf-4849-42e9-bd0e-7c35adf7b181)
+
 Jimba or j is a console.log wrapper library which eliminates the following problems and j.js solutions:
 
 1.  Repeated addition and removal
