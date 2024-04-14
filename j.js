@@ -140,7 +140,7 @@ export function tE(title="JIMBA")
     {
         _FUNCTIONS.push(title);
 
-        console.timeEnd("TIME : "+title.toUpperCase());
+        console.timeEnd("TIME : "+title);
 
         console.log("%cTOTAL_ERRORS : " + TOTAL_FAIL,"background-color:#fff;color:darkred;");
 
