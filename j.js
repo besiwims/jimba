@@ -1,15 +1,18 @@
-export let TOTAL_FAIL = 0;
-export let TOTAL_PASS = 0;
-export const  _R  = 0;
-let _F = 0;
-export const _FUNCTIONS =[];
-
-function off(r)
-{
-    if(r)
-    {
-        _F = 0;
-    } 
+export const opt = {
+    TOTAL_FAIL : 0,
+    TOTAL_PASS : 0,
+    _R : false,
+    _F : false,
+    foff : false,
+    _FUNCTIONS : [],
+    tS_ : true,
+    tE  : true,
+    off:function(r){
+        if(r)
+        {
+            this._F = false;
+        }
+    }
 }
 
 export function j(o, r,g=false,gOff=false)
@@ -18,7 +21,7 @@ export function j(o, r,g=false,gOff=false)
 
     if(r)
     {
-        _F = !0;
+        opt._F = !0;
 
         const name = Object.keys(o)[0];
         const value = Object.values(o)[0];
@@ -35,7 +38,7 @@ export function j(o, r,g=false,gOff=false)
         o = name
     }
 
-    if (_R || _F)
+    if (opt._R || opt._F)
     {
 
         if(Array.isArray(o))
@@ -54,12 +57,12 @@ export function j(o, r,g=false,gOff=false)
                 if(typeof o == 'object')
                 {
                     console.log(o) ;
-                    off(g_);
+                    opt.off(g_);
                     return
                 }
                 else
                 {
-                    off(g_);
+                    opt.off(g_);
                     return console.warn(o,r)
                 }               
                
@@ -69,7 +72,7 @@ export function j(o, r,g=false,gOff=false)
             if(typeof o == 'object')
             {
                 console.log(o) ;
-                off(g_);
+                opt.off(g_);
                 return
             }
             else
@@ -77,17 +80,18 @@ export function j(o, r,g=false,gOff=false)
                 (new Error).stack.toString().replace("Error", " ");
                 if(0 === o || o.toString().trim().length < 1 || o.toString().toLowerCase().includes("empty") || 0 === o || null === o || "0" === o || "null" === o || o.toString().includes("error") || e.toString().includes("undefined"))
                 {
-                        console.log(l, "background-color:#fff;color:red;");  TOTAL_FAIL++;                
+                        console.log(l, "background-color:#fff;color:red;");  opt.TOTAL_FAIL++;                
                 }
                 else
                 {        
-                (null, console.log(e, "background-color:#fff;color:green;")); TOTAL_PASS++;
+                (null, console.log(e, "background-color:#fff;color:green;")); opt.TOTAL_PASS++;
                 }
             }
         }
         else 
         {
-            console.log(l, "background-color:#fff;color:red;");TOTAL_FAIL++;  
+            console.log(l, "background-color:#fff;color:red;");
+            opt.TOTAL_FAIL++;  
         }
 
         if(gOff)
@@ -102,10 +106,10 @@ export function o(o,r=false)
 { 
     if(r)
     {
-        _F = !0;
+        opt._F = !0;
     }
      
-    if (_R || _F)
+    if (opt._R || opt._F)
     {
         const name = Object.keys(o)[0];
         console.warn(name,o)
@@ -117,58 +121,73 @@ export function o(o,r=false)
     }
 }
 
-
-let tS_ = false;
-
 export function tS(title="JIMBA",k=false)
 {
 
     if(k == true)
     {
-        tS_ = true;
+        opt.tS_ = true;
     }   
  
-    if(title && (_R || tS_))
+    if(title && (opt._R || k==true))
     {
-        console.time("TIME : "+title.toUpperCase());       
+        opt._FUNCTIONS.push(title);
+
+        console.log( opt._FUNCTIONS)
+
+        console.time("TIME : "+title);       
     }
 }
 
-export function tE(title="JIMBA")
+export function tE(title="JIMBA",k=false)
 {
-    if(title && (_R || tS_))
+    if(title && (opt._R || k==true))
     {
-        _FUNCTIONS.push(title);
-
         console.timeEnd("TIME : "+title);
 
-        console.log("%cTOTAL_ERRORS : " + TOTAL_FAIL,"background-color:#fff;color:darkred;");
+        if(opt.TOTAL_FAIL > 0)
+        {
+            console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL,"background-color:#fff;color:darkred;");
+        }
+        if(opt.TOTAL_PASS > 0)
+        {
+            console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS,"background-color:#fff;color:blue;");
+        }
 
-        console.log("%cTOTAL_PASSES : " + TOTAL_PASS,"background-color:#fff;color:blue;");
-
-        tS_ = !0;
+        funcs()
+        
+        opt.tS_ = false;
         
     }
 }
 
 export function fails(){
-    if(_R || tS_)
-    console.log("%cTOTAL_ERRORS : " + TOTAL_FAIL,"background-color:#fff;color:darkred;");
+    if(opt._R || opt.tS_){
+        if(opt.TOTAL_FAIL > 0)
+        {
+            console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL,"background-color:#fff;color:darkred;");
+        }
+    }
+    
 }
 
 export function passes(){
-    if(_R || tS_)
-    console.log("%cTOTAL_PASSES : " + TOTAL_PASS,"background-color:#fff;color:blue;");
+    if(opt._R || opt.tS_)
+    {
+        if(opt.TOTAL_PASS > 0){
+            console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS,"background-color:#fff;color:blue;");
+        }
+    }
+    
 }
 
-export function funcs(){
-    if(_R || tS_)
+export function funcs(k=false){
+    if((opt._R || opt.tS_ ) && (k || (opt._FUNCTIONS.length > 0)))
     {
-        const fT = _FUNCTIONS.length;
+        const fT = opt._FUNCTIONS.length;
         console.log("%cTOTAL_FUNCTIONS : " + fT,"background-color:#fff;color:purple;");
-        const funcs_ = _FUNCTIONS.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
+        const funcs_ = opt._FUNCTIONS.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
         console.log(funcs_);
     }
 
 }
-
