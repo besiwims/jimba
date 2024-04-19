@@ -1,4 +1,5 @@
 /*
+0. Version 1.0.9
 1. Library: Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library
 2. Author: Bernard Sibanda [Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd]
 3. License: MIT
@@ -91,12 +92,16 @@ j.js:368 ✓ PASS : [object Object]
 export const opt = {
     TOTAL_FAIL : 0,
     TOTAL_PASS : 0,
+    TOTAL_TESTS_PASS :0,
+    TOTAL_TESTS_FAIL :0,
+    TOTAL_TESTS_RUN :0,
+    TOTAL_WRONG_DATA_TYPES_PARAMS :0,
     _R : false,
     _F : false,
+    _T : false,
     foff : false,
     _FUNCTIONS : [],
     tS_ : true,
-    tE  : true,
     off:function(r){
         if(r==0)
         {
@@ -116,24 +121,26 @@ export function j(o, r=0,g=false,gOff=false)
 
     if(r != 0)
     {
-        opt._F = !0;
+        opt._F = true;
 
         const name = Object.keys(o)[0];
         const value = Object.values(o)[0];
 
-        r = value
-        o = name
+        r = value;
+        o = name;
     }
     else
     {
         const name = Object.keys(o)[0];
         const value = Object.values(o)[0];
 
-        r = value
-        o = name
+        r = value;
+        o = name;
+
+        opt._F = false;
     }
 
-    if (opt._R || opt._F)
+    if (opt._R || opt._F==true)
     {
 
         if(Array.isArray(o))
@@ -201,10 +208,31 @@ export function o(o,r=0)
 { 
 
     if (opt._R || !(r ==0))
-    {
-        const name = Object.keys(o)[0];
-        console.warn(name,o)
-        return
+    {     
+        if((typeof o === 'object') ) 
+        {
+           
+            if((Object.keys(o).length < 1))
+            {
+                console.log("%cX FAIL : OBJECT EMPTY", "background-color:darkred;color:#FFF;");
+                opt.TOTAL_FAIL++;
+                return
+            }
+            else
+            {
+                const name = Object.keys(o)[0];
+                console.log("%c\u2713 PASS " + name, "background-color:darkgreen;color:#fff;")
+                console.warn(name,o);
+                opt.TOTAL_PASS++;
+                return
+            }
+
+        }
+        else
+        {
+            console.log("empty")
+        }
+
     }
 
 }
@@ -214,7 +242,7 @@ export function tS(title="JIMBA",k=0)
 
     if(!(k == 0))
     {
-        opt.tS_ = t_;
+        opt.tS_ = true;
     }   
  
     if(title && (opt._R || !(k == 0)))
@@ -250,7 +278,7 @@ export function tE(title="JIMBA",k=0)
 }
 
 function fails(k=0){
-    if(opt._R || !(k == 0)){
+    if(opt._T || opt._R || !(k == 0)){
         if(opt.TOTAL_FAIL > 0)
         {
             console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL,"background-color:#fff;color:darkred;");
@@ -260,7 +288,7 @@ function fails(k=0){
 }
 
 function passes(k=0){
-    if(opt._R || !(k == 0))
+    if(opt._T || opt._R || !(k == 0))
     {
         if(opt.TOTAL_PASS > 0){
             console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS,"background-color:#fff;color:blue;");
@@ -270,7 +298,7 @@ function passes(k=0){
 }
 
 function funcs(k=0){
-    if((opt._R || opt.tS_ ) && (!(k == 0) || (opt._FUNCTIONS.length > 0)))
+    if((opt._T || opt._R || opt.tS_ ) && (!(k == 0) || (opt._FUNCTIONS.length > 0)))
     {
         const fT = opt._FUNCTIONS.length;
         console.log("%cTOTAL_FUNCTIONS : " + fT,"background-color:#fff;color:purple;");
@@ -280,8 +308,32 @@ function funcs(k=0){
 
 }
 
+function tests(k=0){
+
+   
+    if(opt._T == false){opt.tS_  = false;}
+
+    if((opt._T || opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_PASS > 0)))
+    {
+        console.log("%cTOTAL_TESTS_PASS : " + opt.TOTAL_TESTS_PASS,"background-color:blue;color:#fff;"); 
+    }
+    if((opt._T || opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_FAIL > 0)))
+    {
+        console.log("%cTOTAL_TESTS_FAIL : " + opt.TOTAL_TESTS_FAIL,"background-color:blue;color:#fff;"); 
+    }
+    if((opt._T || opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_RUN > 0)))
+    {
+        console.log("%cTOTAL_TESTS_RUN : " + opt.TOTAL_TESTS_RUN,"background-color:blue;color:#fff;"); 
+    }
+    if((opt._T || opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_WRONG_DATA_TYPES_PARAMS > 0)))
+    {
+        console.log("%cTOTAL_WRONG_DATA_TYPES_PARAMS : " + opt.TOTAL_WRONG_DATA_TYPES_PARAMS,"background-color:blue;color:#fff;"); 
+    }
+
+}
+
 export function jtrics(){
-    passes(),fails();funcs();
+    passes(),fails();funcs();tests();
 }
 
 const compareArrays = (a, b) => {    
@@ -291,8 +343,6 @@ const compareArrays = (a, b) => {
   const compareObjects = (a, b) => {    
 
     if(typeof a == 'object' && typeof b == 'object' ){
-
-        console.log(a,b);
 
         const aObjElementTotal = a.length;
         const bObjElementTotal = a.length;
@@ -331,8 +381,10 @@ const compareArrays = (a, b) => {
 
   };
 
-export function jtest(title,varString,expectedAnser,k=0){
-    if (opt._R || !(k !== 0))
+export function jtest(title,varString,expectedAnswer,k=0){
+    opt.TOTAL_TESTS_RUN++;
+
+    if (opt._R || (k !== 0)||(opt._T == true))
     {
         typeof varString === 'string';
 
@@ -340,78 +392,91 @@ export function jtest(title,varString,expectedAnser,k=0){
 
         let results = "";
 
-        if(typeof varString === 'string' && typeof expectedAnser === 'string')
+        if(typeof varString === 'string' && typeof expectedAnswer === 'string')
         {
-            results = varString.localeCompare(expectedAnser);
+            results = varString.localeCompare(expectedAnswer);
 
             if(results === 0)
             {
-                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;"); opt.TOTAL_PASS++;
+                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;"); opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
             }
             else
-            {
-                console.log("%cX FAIL : Am expecting " + expectedAnser + ", but got " + varString,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            {   opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
             }
         }
-        else if(typeof varString === 'number' && typeof expectedAnser === 'number')
+        else if(typeof varString === 'number' && typeof expectedAnswer === 'number')
         {
-            results = varString === expectedAnser;
+            results = varString === expectedAnswer;
 
             if(results === true)
             {
-                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;
+                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
             }
             else
-            {
-                console.log("%cX FAIL : Am expecting " + expectedAnser + ", but got " + varString,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
             }
         }
-        else if(typeof varString === 'boolean' && typeof expectedAnser === 'boolean')
+        else if(typeof varString === 'boolean' && typeof expectedAnswer === 'boolean')
         {
-            results = varString === expectedAnser;
+            results = varString === expectedAnswer;
 
             if(results === true)
             {
-                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;
+                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
             }
             else
-            {
-                console.log("%cX FAIL : Am expecting " + expectedAnser + ", but got " + varString,"background-color:#fff;color:red;"); opt.TOTAL_FAIL++;
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
             }
         }
-        else if(Array.isArray(varString) && Array.isArray(expectedAnser))
+        else if(Array.isArray(varString) && Array.isArray(expectedAnswer))
         {
-            results = compareArrays(varString, expectedAnser);
+            results = compareArrays(varString, expectedAnswer);
 
             if(results === true)
             {
-                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;
+                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
             }
             else
-            {
-                console.log("%cX FAIL : Am expecting " + expectedAnser + ", but got " + varString,"background-color:#fff;color:red;"); opt.TOTAL_FAIL++;
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
             }
         }
-        else if(typeof varString === 'object' && typeof expectedAnser === 'object')
+        else if(typeof varString === 'object' && typeof expectedAnswer === 'object')
         {
-            results = compareObjects(varString,expectedAnser);
+            results = compareObjects(varString,expectedAnswer);
 
             if(results === true)
             {
-                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;
+                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
             }
             else
-            {
-                console.log("%cX FAIL : Am expecting " + expectedAnser + ", but got " + varString,"background-color:#fff;color:red;"); opt.TOTAL_FAIL++;
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
             }
         }
         else
-        {
+        {   opt.TOTAL_WRONG_DATA_TYPES_PARAMS++;
             console.log(varString);
-            console.log(expectedAnser);
-            console.log("%c WRONG DATA TYPES GIVEN!","background-color:#fff;color:red;");
+            console.log(expectedAnswer);
+            console.log("%c WRONG DATA TYPES GIVEN! First param is of : " + typeof varString + ", Second param is of : " + typeof expectedAnswer,"background-color:#fff;color:red;");
         }
         
+    }
+    else
+    {
+        //
     }
 
 }
