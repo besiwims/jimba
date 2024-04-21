@@ -1,5 +1,5 @@
 /*
-0. Version 1.0.9
+0. Version 1.1.0
 1. Library: Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library
 2. Author: Bernard Sibanda [Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd]
 3. License: MIT
@@ -97,9 +97,10 @@ export const opt = {
     TOTAL_TESTS_RUN :0,
     TOTAL_WRONG_DATA_TYPES_PARAMS :0,
     _R : false,
-    _F : false,
+    _J : false,
     _T : false,
     foff : false,
+    _O:false,
     _FUNCTIONS : [],
     tS_ : true,
     off:function(r){
@@ -117,30 +118,17 @@ export const opt = {
 
 export function j(o, r=0,g=false,gOff=false)
 {
+
+    //console.log(o)
     let g_ = r;
 
-    if(r != 0)
-    {
-        opt._F = true;
+    const name = Object.keys(o)[0];
+    const value = Object.values(o)[0];
 
-        const name = Object.keys(o)[0];
-        const value = Object.values(o)[0];
+    r = value;
+    o = name;
 
-        r = value;
-        o = name;
-    }
-    else
-    {
-        const name = Object.keys(o)[0];
-        const value = Object.values(o)[0];
-
-        r = value;
-        o = name;
-
-        opt._F = false;
-    }
-
-    if (opt._R || opt._F==true)
+    if (opt._R || opt._J == true)
     {
 
         if(Array.isArray(o))
@@ -160,7 +148,9 @@ export function j(o, r=0,g=false,gOff=false)
                 {
                     console.log(o) ;
                     opt.off(g_);
-                    return
+                    return                
+                }else if(opt._J == true){
+                    console.log("%c✓ PASS : " + name,"background-color:#fff;color:green;");opt.TOTAL_PASS++;
                 }
                 else
                 {
@@ -189,6 +179,9 @@ export function j(o, r=0,g=false,gOff=false)
                 (null, console.log(e, "background-color:#fff;color:green;")); opt.TOTAL_PASS++;
                 }
             }
+        }else if(opt._J == true){
+            const name = Object.keys(o)[0];
+            console.log("%c✓ PASS : " + name,"background-color:#fff;color:green;");opt.TOTAL_PASS++;
         }
         else 
         {
@@ -207,7 +200,7 @@ export function j(o, r=0,g=false,gOff=false)
 export function o(o,r=0)
 { 
 
-    if (opt._R || !(r ==0))
+    if (opt._O || opt._R || !(r ==0))
     {     
         if((typeof o === 'object') ) 
         {
@@ -220,17 +213,32 @@ export function o(o,r=0)
             }
             else
             {
-                const name = Object.keys(o)[0];
-                console.log("%c\u2713 PASS " + name, "background-color:darkgreen;color:#fff;")
-                console.warn(name,o);
-                opt.TOTAL_PASS++;
-                return
+                if((Object.keys(o).length == 1) && 
+                ((Object.values(o)[0].toString().trim().length == 0) ||(JSON.stringify(Object.values(o)[0]) =="{}") ||(JSON.stringify(Object.values(o)[0]) =="0")))
+                {
+                    const name = Object.keys(o)[0];
+                    console.log("%cX FAIL " + name, "background-color:red;color:#fff;")
+                    console.warn(name,o);
+                    opt.TOTAL_FAIL++;
+                    return
+                }
+                else
+                {
+     
+                    const name = Object.keys(o)[0];
+                    console.log("%c\u2713 PASS " + name, "background-color:darkgreen;color:#fff;")
+                    console.warn(name,o);
+                    opt.TOTAL_PASS++;
+                    return
+                }
+
             }
 
         }
         else
         {
-            console.log("empty")
+            console.log("%cX FAIL : object is empty.","background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+
         }
 
     }
