@@ -1,0 +1,95 @@
+import { jtest, j, o,opt, tS, tE, jtrics } from "jimba";
+opt._R = false; //Runs all(o(),j(),tS(),tE(),jtests(),totals) when turned to true. Why to check code coverage
+const _s = 0;   //Runs only o(),j() etc when turned to 1 else ignores them. Use this for only testing variables
+const _d = 0;   //Runs only functions when turned to 1 else ignores them. Use this for selecting functions to test
+opt._J = false;
+opt._O = false;
+opt._T = false;  //Runs only jtests and totals when turned to true
+// j({walletAddress});
+// o(skey); not curly brackets for objects!!!
+// tS("Home",_s);
+// tE("Home",_s);
+// passes();
+// fails();
+// funcs();
+// jtest()
+// jtrics() This will call fail(), passes(), funcs() functions and give Jimba Matrics
+// const emptObject = {};
+// o(emptObject);
+// const realObject = {name:"james",Surname:0};
+// o(realObject);
+// let name = 'james';
+// let answer = 'jame';
+// jtest("name",name,answer);
+// jtest("number",7,7);
+// jtest("bool",true,true);
+// const walletAddress = 'addr83843849494949'; j({walletAddress});
+// const skey = process.env.NEXT_PUBLIC_SKEY!; o(skey);
+// const arr1 = ["2","4","7"];
+// const arr2 = ["2","1","7"];
+// jtest("arrays",arr1,arr2);
+// const ag = {a:1,c:2,n:4}; 
+// const bn = {a:1,c:2,n:4}; 
+// jtest("objects",ag,bn);
+// j({utxos},_s);
+// o(utxos,_s);
+// const obj_ = {};
+// o(obj_);
+// jtrics();
+
+const emptObject = {};
+o({emptObject});
+const realObject = {name:"james",Surname:0};
+o({realObject});
+let name = 'james';
+let answer = 'jame'; j({answer});
+jtest("name",name,answer);
+jtest("number",7,7);
+jtest("bool",true,true);
+const walletAddress = 'addr83843849494949'; j({walletAddress});
+const skey = process.env.NEXT_PUBLIC_SKEY!; o(skey);
+
+const arr1 = ["2","4","7"];
+const arr2 = ["2","1","7"];
+jtest("arrays",arr1,arr2);
+
+const ag = {a:1,c:2,n:4}; 
+const bn = {a:1,c:2,n:4}; 
+jtest("objects",ag,bn);
+
+export default function Home() {
+tS("Home",_d);
+tE("Home",_d);
+
+
+const queryUtxos = async (walletAddress: string) => {
+const utxos = await maestro.fetchAddressUTxOs(walletAddress); 
+
+j({utxos},_s);
+
+o({utxos},_s);
+
+const obj_ = {};
+
+o({obj_});
+
+const surname = "sibanda"; o({surname});
+
+const age = ''; o({age}); jtest('age',age,67);
+
+const pass = 0; o({pass}); jtest('pass',pass,67);
+
+const name = "";o({name}); jtest('name',name,'thulani');
+
+const male = false;o({male}); jtest('male',male,true);
+
+const passed = true;o({passed}); jtest('passed',passed,false);
+
+const testF = ()=>{
+return 1+2
+}
+
+o({testF});
+
+jtrics();
+
