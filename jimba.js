@@ -1,173 +1,455 @@
-/**
- * Title : Jimba Extended Consolelog Tool -> JECT
- * Description : 
- *  This is a tool to log and trace contents of variables. It flags undefined, null, empty variables
- *  Problem : Developers face the problem of writing code and blotting it with lots of console logs
- *            Removing and re-entering these console.logs is cumbersome. This tool JECT solves this problem.
- *  How? Developer simply calls j() function along or below the variable/const and JECT will keep check
- *       if it is null/undefined/empty etc. It will flag red once it is, giving file name and estimate line number.
- * Author : Bernard Sibanda
- * Date : 16-07-2023
- * URL : 
- * Company : Tobb Technologies Pty Ltd
- * License : MIT
- * How to use it : 
- *  a) create a file named jimba.js and copy this content here to the file
- *  b) Go to the file you want to log/trace
- *  c) Add this function along or below the variable/const/object you want to watch
- *  d) FLAGS to set are `_R = !0` at Jimba file means RUN tracing and `_R = 0` means switch off console logging
- *     and `_RS = !0` at Jimba file means RUN tracing only on selected variables and `_RS = 0` means switch off console logging
- *  e) If `_RS` is = !0 then the j() function will have 3 parameters e.g. j(nelliVa+f(),"nelliVa 95",1). The `1` third parameter
- *     is telling JECT to log the variable if `_RS` is turned on otherwise it will be off e.g. j(nelliVa+f(),"nelliVa 95");
- *  Examples are given below 
- *  
-  const temp = {'age':90,'name':null}
-  const art = [1,2,3]
-  const stringname = "bernrad"
-  const age = 60
-  j(temp+f(),"temp 73",1);
-  j(art+f(),"art 75",1);
-  j(stringname+f(),"stringname 77",1);
-  j(age+f(),"age 79",1);
-  j(apiKey+f(),"apiKey 87",1);
-  const nullVar = ""
-  j(nullVar+f(),"nullVar 91",1);
-  const nelliVa = undefined
-  j(nelliVa+f(),"nelliVa 95",1);
+/*
+0. Version 1.1.1
+1. Library: Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library
+2. Author: Bernard Sibanda [Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd]
+3. License: MIT
+4. Date : 01-05-2024
+5. How to install: NPM -> for npm one has to run this command npm i jimba, for websites simple add the script tag to the j.js file. This means you copy the j.js file from github and add contents to the j.js
+6. Authour : Bernard Sibanda [Tobb Technologies, Women In Move Solutions]
 
-  Output console logs will be:
+Installation using nodejs npm. On the vscode terminal run npm i jimba or npm i jimba --force if there are dependence issues
+Usage : The opt object is a collection of switches using 0 for false and any number say 1 for true
 
-        1[ [object Object] pages/rc.tsx:43:95)
-        ]  ✓ PASS  :temp 73
-        jimba.js:68 3[ 1,2,3 pages/rc.tsx:44:94)
-        ]  ✓ PASS  :art 75
-        jimba.js:68 5[ bernrad pages/rc.tsx:45:101)
-        ]  ✓ PASS  :stringname 77
-        jimba.js:68 7[ 60 pages/rc.tsx:46:94)
-        ]  ✓ PASS  :age 79
-        jimba.js:68 9[ preprodH0XGC6fxggohEF0wlqG1KsKjvmjQ2aI4 pages/rc.tsx:52:97)
-        ]  ✓ PASS  :apiKey 87
-        jimba.js:68 11[  pages/rc.tsx:54:98)
-        ]  ✓ PASS  :nullVar 91
-        jimba.js:66 14[ undefined pages/rc.tsx:56:98)
-        ]  x FAIL :*** VAR EMPTY *** :nelliVa 95
+import {opt,jtest,jtrics,o,tS,tE } from 'jimba'; //use this at the top page
+opt._O = 0; // console.log the variable, array, or object using function o() as follows: 
+            // const varDemo = "jimba demo"; o({varDemo})
+            // Please note the the o() parameter takes object so always add the {} around your variable
+            // this will help tell you the name of item being logged
+opt._FailsOnly = 0; // Change this to 1 to only see errors and failing tests
+opt._T = 0; // Change this to 1 to only see tests created using the jtest() function
+            // jtest demo: const x = (y,c)=>{ return y * c}; jtest("demo",demo(2,3),6)
+            // Firs parameter is description of test
+            // Second parameter is the function call with its arguments
+            // Third parameter of jtest is the expected answer
+opt._M = 0; // _M is a switch to turn on/off console log call stack. Use 0 for false and 1 for true
+opt._R = 0; // _R switch is turned on by 1 to run everything: logs, tests and function profilings and 0 to turn it off
+opt._F = 0; // _F switch is to turn on (1) or off(0) functions profilling function matrics
 
-   Measuring time code takes to execute :
+ 
+*/
 
-   For this us the tm() function. Do not nest the tm() functions as of now, we will improve this
-   Go to where you want to start measuring time and paste this tm(!0,j,f,"A 97",dObject) This is for starting to log time
-   Place tm(0,j,f,"A 97",dObject) where you want to end measureing time. Please note the first parameter is false(0) not !0 true
-   
-   Output will be 
+export const opt = {
+    TOTAL_FAIL : 0,
+    TOTAL_PASS : 0,
+    TOTAL_TESTS_PASS :0,
+    TOTAL_TESTS_FAIL :0,
+    TOTAL_TESTS_RUN :0,
+    TOTAL_WRONG_DATA_TYPES_PARAMS :0,
+    _R : 0,
+    _FailsOnly :0,
+    _T : 0,
+    _O : 0,
+    _M : 0,
+    _F : 0,
+    _Tc : 0,
+    _tNo : 20,
+    _Min : -100,
+    _Max : 100,
+    _FUNCTIONS : [],
+}
 
-    69[ 1689491631777 ]  ✓ PASS  :A 97 : STARTED 
-    jimba.js:109 71[ 1689491631781 | 4 ms ]  ✓ PASS  :A 317  : ENDED 
-
-    This shows that time taken from A 97 to A 317 is 4ms. Great!
- */
-
-    export  const _R = !0
-    export const _RS = !0
-    export  let dObject = {"dTimeStart":0,"dTimeEnd":0}
-    export  let count = 1
-    export  function j(msg,name = ' **VAR**',s=0) {
-        if (_R) {
-            if(_RS && s===1)
+export function o(o,r=0)
+{ 
+    
+    if(opt._O == 1 || opt._R == 1)
+    {
+        if(o == null || o == undefined || o == 0 || o == '')
+        {
+            console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+            console.trace(o);
+        }
+        else
+        {
+            if(typeof o == 'object' && o != null)
             {
-                const success = count++ + "[ "+msg+" ] %c \u2713 PASS  :" + name ;
-                const fail = count++ + "[ "+msg+" ] %c x FAIL :*** VAR EMPTY *** :" + name ;
-    
-                let msgLength = 0;
-    
-                if (typeof msg === 'string' || msg instanceof String)
+                const name = Object.keys(o);  
+                const val = Object.values(o);  
+                if(val == '' || val == 0 || val == 'null' || val == 'undefined' || val == ['']) 
                 {
-                    msgLength = msg.trim().length; 
-                }
-                else if(typeof msg === 'object')
-                {
-                    console.log(count++ + "[ "+ Object.entries(msg) +" "+f()+" ] %c \u2713 PASS  :" + name,"background-color:#fff;color:green;");
-                    return
+                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                    console.info(o);
                 }
                 else
                 {
-                    if(msg)
+                    if(opt._FailsOnly === 0)            
                     {
-                        msgLength = JSON.stringify(msg).trim().length;
-                    }                 
-                }
-                          
-                if (msgLength >= 1) {
-                    let e = new Error().stack.toString().replace("Error", " ");
-                    if (msg === undefined || (msg.toString().trim().length < 1) || msg.toString().toLowerCase().includes("empty" || msg.toString().toLowerCase().includes("null" || msg.toString().toLowerCase().includes("undefined") || msg.toString().toLowerCase().includes("error")))) {
-                        msg = fail;
-                        console.log(fail, "background-color:red;color:#fff;")
-                    } else {
-                        if (msg.toString().includes('error')) {
-                            msg = fail;
-                            console.log(fail, "background-color:red;color:#fff;")
-                        } else {
-                            if (success.toString().includes('undefined')) {
-                                console.log(fail, "background-color:red;color:#fff;")
-                            } else {
-                                console.log(success, "background-color:#fff;color:green;")
-                            }
+                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                        if(opt._M)
+                        {
+                            console.trace(o);
                         }
+                        else
+                        {
+                            console.info(o);
+                        }
+                                            
                     }
-                } else {
-                    console.log(fail, "background-color:#fff;color:red;")
+                    
                 }
-            }
-            else if(_RS && s===0)
-            {
-               //
             }
             else
-            {
-                const success = count++ + "[ "+msg+" ] %c \u2713 PASS  :" + name ;
-                const fail = count++ + "[ "+msg+" ] %c x FAIL :*** VAR EMPTY *** :" + name ;
-                if (msg) {
-                    let e = new Error().stack.toString().replace("Error", " ");
-                    if (msg === undefined || (msg.toString().trim().length < 1) || msg.toString().toLowerCase().includes("empty" || msg.toString().toLowerCase().includes("null" || msg.toString().toLowerCase().includes("undefined") || msg.toString().toLowerCase().includes("error")))) {
-                        msg = fail;
-                        console.log(fail, "background-color:red;color:#fff;")
-                    } else {
-                        if (msg.toString().includes('error')) {
-                            msg = fail;
-                            console.log(fail, "background-color:red;color:#fff;")
-                        } else {
-                            if (success.toString().includes('undefined')) {
-                                console.log(fail, "background-color:red;color:#fff;")
-                            } else {
-                                console.log(success, "background-color:#fff;color:green;")
-                            }
-                        }
-                    }
-                } else {
-                    console.log(fail, "background-color:#fff;color:red;")
+            {             
+                if(((typeof o == 'number' && o > 0) || (typeof o == 'boolean' && o == true) || 
+                (typeof o == 'string' && o.trim().length > 0)))
+                {
+                    if(opt._FailsOnly === 0)               
+                    {
+                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                        console.info(o);
+                    } 
+                }
+                else
+                {
+                    console.log(o)
+                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                    console.trace(o);
                 }
             }
-        } 
-        else 
-        {
-    
+             
         }
     }
-    export  function f(){var stack=new Error().stack,functionCaller=stack.split('\n')[2].trim();return" "+functionCaller.split("///./")[1]+"\n"};
     
-    export function tm(startTimeBool,j,f,identifierSymbol="A",dObject=dObject){
-        if(startTimeBool){
-            dObject.dTimeStart = Date.now();
-            j(dObject.dTimeStart, identifierSymbol  + " : STARTED ",1)
+}
+
+export function tS(title="JIMBA",k=0)
+{
+
+    if(!(k == 0))
+    {
+        opt.tS_ = true;
+    }   
+ 
+    if(title && (opt._F || opt._R || !(k == 0)))
+    {
+        opt._FUNCTIONS.push(title);
+
+        console.log( opt._FUNCTIONS)
+
+        console.time("TIME : "+title);       
+    }
+}
+
+export function tE(title="JIMBA",k=0)
+{
+    if(title && (opt._F || opt._R || !(k == 0)))
+    {
+        console.timeEnd("TIME : "+title);
+
+        if(opt.TOTAL_FAIL > 0)
+        {
+            console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL,"background-color:#fff;color:darkred;");
+        }
+        if(opt.TOTAL_PASS > 0)
+        {
+            console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS,"background-color:#fff;color:blue;");
+        }
+
+        funcs()
+        
+        opt.tS_ = false;
+        
+    }
+}
+
+function fails(k=0){
+    if(opt. _O || opt._T ==1|| opt._R || !(k == 0))
+    {
+        if(opt.TOTAL_FAIL > 0)
+        {
+            console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL,"background-color:#fff;color:darkred;");
+        }
+    }
+    
+}
+
+function passes(k=0){
+    if(opt. _O || opt._T ==1|| opt._R || !(k == 0))
+    {
+        if(opt.TOTAL_PASS > 0){
+            console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS,"background-color:#fff;color:blue;");
+        }
+    }
+    
+}
+
+function funcs(k=0){
+    if((opt. _O || opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt._FUNCTIONS.length > 0)))
+    {
+        const fT = opt._FUNCTIONS.length;
+        console.log("%cTOTAL_FUNCTIONS : " + fT,"background-color:#fff;color:purple;");
+        const funcs_ = opt._FUNCTIONS.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
+        console.log(funcs_);
+    }
+
+}
+
+function tests(k=0){
+
+   
+    if(opt._T == 1){opt.tS_  = false;}
+
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_PASS > 0)))
+    {
+        console.log("%cTOTAL_TESTS_PASS : " + opt.TOTAL_TESTS_PASS,"background-color:blue;color:#fff;"); 
+    }
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_FAIL > 0)))
+    {
+        console.log("%cTOTAL_TESTS_FAIL : " + opt.TOTAL_TESTS_FAIL,"background-color:darkred;color:#fff;"); 
+    }
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_RUN > 0)))
+    {
+        console.log("%cTOTAL_TESTS_RUN : " + opt.TOTAL_TESTS_RUN,"background-color:blue;color:#fff;"); 
+    }
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_WRONG_DATA_TYPES_PARAMS > 0)))
+    {
+        console.log("%cTOTAL_WRONG_DATA_TYPES_PARAMS : " + opt.TOTAL_WRONG_DATA_TYPES_PARAMS,"background-color:blue;color:#fff;"); 
+    }
+
+}
+
+export function jtrics(k=0){
+    passes(k),fails(k);funcs(k);tests(k);
+}
+
+const compareArrays = (a, b) => {    
+    return JSON.stringify(a) === JSON.stringify(b);
+  };
+
+  const compareObjects = (a, b) => {    
+
+    if(typeof a == 'object' && typeof b == 'object' ){
+
+        const aObjElementTotal = a.length;
+        const bObjElementTotal = a.length;
+
+        const objTotalSame = aObjElementTotal === bObjElementTotal;
+
+        if(!objTotalSame){
+            return false;
         }
         else{
-            dObject.dTimeEnd = Date.now();       
-            const durationMilsec = dObject.dTimeEnd - dObject.dTimeStart;          
-            j(dObject.dTimeEnd + " | " + durationMilsec + " ms", identifierSymbol  + "  : ENDED ",1)
-    
-            dObject.dTimeStart = 0
-            dObject.dTimeEnd = 0
-    
+                const  aKeysArray = Object.keys(a);
+                const aKeysArraySorted = aKeysArray.sort();
+                const  aValuesArray = Object.keys(a);
+                const aValuesArraySorted = aValuesArray.sort();
+
+                const  bKeysArray = Object.keys(b);
+                const bKeysArraySorted = bKeysArray.sort();
+                const  bValuesArray = Object.keys(b);
+                const bValuesArraySorted = bValuesArray.sort();
+
+                if(compareArrays(aKeysArraySorted,bKeysArraySorted) && compareArrays(aValuesArraySorted,bValuesArraySorted))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+        }    
+
+    }
+    else{
+        return false;
+    }
+
+  };
+
+export function gNo(min=opt._Min, max=opt._Max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function alphaNumericSymbolsString(length){
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_?|[]{}:",.!@#$%^&*()+~`';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < length) {
+          result += characters.charAt(Math.floor(Math.random() * charactersLength));
+          counter += 1;
+        }
+        return result;
+}
+
+function lowerCaseAlphabetString(length){
+    let result = '';
+    const characters = 'abcdefghijklmnopqrstuvwxyz';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;   
+}
+
+function upperCaseAlphabetString(length){
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;   
+}
+
+function onlyDigitsString(length){
+    let result = '';
+    const characters = '0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;   
+}
+
+function randomBoolean(){
+    return Math.random() < 0.5;
+}
+
+export function jtest(title,varString,expectedAnswer,k=0){
+
+    if(!title || !varString || !expectedAnswer)
+    {
+        if(opt._T == 1)
+        {
+            const trackcalls = (opt._Tc++)+" : "; 
+            console.log("%c"+trackcalls+" : TESTING " + title,"background-color:#fff;color:blue;");
+            opt.TOTAL_TESTS_FAIL++;
+            const res = varString?varString:" nothing.";    
+            console.log("%c"+title,"background-color:purple;color:white;")
+            console.log(varString);   
+            console.log(expectedAnswer);     
+            console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;        
+            return
         }
     }
     
-    
+    opt.TOTAL_TESTS_RUN++;
+
+    if (opt._R || (k !== 0)||(opt._T == 1))
+    {
+        typeof varString === 'string';
+
+        const trackcalls = (opt._Tc++)+" : "; 
+
+        console.log("%c"+trackcalls+" : TESTING " + title,"background-color:#fff;color:blue;");
+
+        let results = "";
+
+        if(varString === undefined || varString == null)
+        {
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : UNDEFINED!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+        }
+        else if(typeof varString === 'string' && typeof expectedAnswer === 'string')
+        {
+            results = varString.localeCompare(expectedAnswer);
+
+            if(results === 0)
+            {
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;"); opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
+            }
+            else
+            {   opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            }
+        }
+        else if(typeof varString === 'number' && typeof expectedAnswer === 'number')
+        {
+            results = varString === expectedAnswer;
+
+            if(results === true)
+            {
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
+            }
+            else
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            }
+        }
+        else if(typeof varString === 'boolean' && typeof expectedAnswer === 'boolean')
+        {
+            results = varString === expectedAnswer;
+
+            if(results === true)
+            {
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
+            }
+            else
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            }
+        }
+        else if(Array.isArray(varString) && Array.isArray(expectedAnswer))
+        {
+            results = compareArrays(varString, expectedAnswer);
+
+            if(results === true)
+            {
+                if(opt._FailsOnly === 0)
+                {
+                 console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;          
+                }
+            }
+            else
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            }
+        }
+        else if(typeof varString === 'object' && typeof expectedAnswer === 'object')
+        {
+            results = compareObjects(varString,expectedAnswer);
+
+            if(results === true)
+            {
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
+            }
+            else
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            }
+        }    
+        else
+        {   opt.TOTAL_WRONG_DATA_TYPES_PARAMS++;
+            console.log(varString);
+            console.log(expectedAnswer);
+            console.log("%c WRONG DATA TYPES GIVEN! First param is of : " + typeof varString + ", Second param is of : " + typeof expectedAnswer,"background-color:#fff;color:red;");
+        }
+        
+    }
+    else
+    {
+        //
+    }
+
+}
