@@ -1,95 +1,27 @@
-import { jtest, j, o,opt, tS, tE, jtrics } from "jimba";
-opt._R = false; //Runs all(o(),j(),tS(),tE(),jtests(),totals) when turned to true. Why to check code coverage
-const _s = 0;   //Runs only o(),j() etc when turned to 1 else ignores them. Use this for only testing variables
-const _d = 0;   //Runs only functions when turned to 1 else ignores them. Use this for selecting functions to test
-opt._J = false;
-opt._O = false;
-opt._T = false;  //Runs only jtests and totals when turned to true
-// j({walletAddress});
-// o(skey); not curly brackets for objects!!!
-// tS("Home",_s);
-// tE("Home",_s);
-// passes();
-// fails();
-// funcs();
-// jtest()
-// jtrics() This will call fail(), passes(), funcs() functions and give Jimba Matrics
-// const emptObject = {};
-// o(emptObject);
-// const realObject = {name:"james",Surname:0};
-// o(realObject);
-// let name = 'james';
-// let answer = 'jame';
-// jtest("name",name,answer);
-// jtest("number",7,7);
-// jtest("bool",true,true);
-// const walletAddress = 'addr83843849494949'; j({walletAddress});
-// const skey = process.env.NEXT_PUBLIC_SKEY!; o(skey);
-// const arr1 = ["2","4","7"];
-// const arr2 = ["2","1","7"];
-// jtest("arrays",arr1,arr2);
-// const ag = {a:1,c:2,n:4}; 
-// const bn = {a:1,c:2,n:4}; 
-// jtest("objects",ag,bn);
-// j({utxos},_s);
-// o(utxos,_s);
-// const obj_ = {};
-// o(obj_);
-// jtrics();
+0. Version 1.1.1
+1. Library: Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library
+2. Author: Bernard Sibanda [Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd]
+3. License: MIT
+4. Date : 01-05-2024
+5. How to install: NPM -> for npm one has to run this command npm i jimba, for websites simple add the script tag to the j.js file. This means you copy the j.js file from github and add contents to the j.js
+6. Authour : Bernard Sibanda [Tobb Technologies, Women In Move Solutions]
 
-const emptObject = {};
-o({emptObject});
-const realObject = {name:"james",Surname:0};
-o({realObject});
-let name = 'james';
-let answer = 'jame'; j({answer});
-jtest("name",name,answer);
-jtest("number",7,7);
-jtest("bool",true,true);
-const walletAddress = 'addr83843849494949'; j({walletAddress});
-const skey = process.env.NEXT_PUBLIC_SKEY!; o(skey);
+Installation using nodejs npm. On the vscode terminal run npm i jimba or npm i jimba --force if there are dependence issues
+Usage : The opt object is a collection of switches using 0 for false and any number say 1 for true
 
-const arr1 = ["2","4","7"];
-const arr2 = ["2","1","7"];
-jtest("arrays",arr1,arr2);
+import {opt,jtest,jtrics,o,tS,tE } from 'jimba'; //use this at the top page
+opt._O = 0; // console.log the variable, array, or object using function o() as follows: 
+            // const varDemo = "jimba demo"; o({varDemo})
+            // Please note the the o() parameter takes object so always add the {} around your variable
+            // this will help tell you the name of item being logged
+opt._FailsOnly = 0; // Change this to 1 to only see errors and failing tests
+opt._T = 0; // Change this to 1 to only see tests created using the jtest() function
+            // jtest demo: const x = (y,c)=>{ return y * c}; jtest("demo",demo(2,3),6)
+            // Firs parameter is description of test
+            // Second parameter is the function call with its arguments
+            // Third parameter of jtest is the expected answer
+opt._M = 0; // _M is a switch to turn on/off console log call stack. Use 0 for false and 1 for true
+opt._R = 0; // _R switch is turned on by 1 to run everything: logs, tests and function profilings and 0 to turn it off
+opt._F = 0; // _F switch is to turn on (1) or off(0) functions profilling function matrics
 
-const ag = {a:1,c:2,n:4}; 
-const bn = {a:1,c:2,n:4}; 
-jtest("objects",ag,bn);
-
-export default function Home() {
-tS("Home",_d);
-tE("Home",_d);
-
-
-const queryUtxos = async (walletAddress: string) => {
-const utxos = await maestro.fetchAddressUTxOs(walletAddress); 
-
-j({utxos},_s);
-
-o({utxos},_s);
-
-const obj_ = {};
-
-o({obj_});
-
-const surname = "sibanda"; o({surname});
-
-const age = ''; o({age}); jtest('age',age,67);
-
-const pass = 0; o({pass}); jtest('pass',pass,67);
-
-const name = "";o({name}); jtest('name',name,'thulani');
-
-const male = false;o({male}); jtest('male',male,true);
-
-const passed = true;o({passed}); jtest('passed',passed,false);
-
-const testF = ()=>{
-return 1+2
-}
-
-o({testF});
-
-jtrics();
-
+ 
