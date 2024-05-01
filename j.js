@@ -1,92 +1,31 @@
 /*
-0. Version 1.1.0
+0. Version 1.1.1
 1. Library: Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library
 2. Author: Bernard Sibanda [Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd]
 3. License: MIT
-4. Date : 18-04-2024
+4. Date : 01-05-2024
 5. How to install: NPM -> for npm one has to run this command npm i jimba, for websites simple add the script tag to the j.js file. This means you copy the j.js file from github and add contents to the j.js
-6. Examples are give below how to import the js or ./j file
+6. Authour : Bernard Sibanda [Tobb Technologies, Women In Move Solutions]
 
-First thing to do is add the opt._R = true for this library to trace else it will be off. You can assign false to stop logging
-Instead of the problematic console.log() calls, simple call j({}) or o({}). These functions need an object as shown below
-Let's say I want to console.log() a variable walletAddress. You simple call j({walletAddress}). Jimba will inspect the variable
-run test of null/empty/etc and PASS or FAIL as per results. It will display an orange warning rectangle wrapping stack calls to files
-If an object or array is being traced or console.logged us o({}) function e.g. const listCows = ["moo","duu","mmm"]; Then 
-trace it as follows o({listCows}). Jimba will console log its properties and do test too.
+Installation using nodejs npm. On the vscode terminal run npm i jimba or npm i jimba --force if there are dependence issues
+Usage : The opt object is a collection of switches using 0 for false and any number say 1 for true
 
-What if I want to profile a function? All one needs to do is to add tS(<function name>) e.g. here an example of a function
+import {opt,jtest,jtrics,o,tS,tE } from 'jimba'; //use this at the top page
+opt._O = 0; // console.log the variable, array, or object using function o() as follows: 
+            // const varDemo = "jimba demo"; o({varDemo})
+            // Please note the the o() parameter takes object so always add the {} around your variable
+            // this will help tell you the name of item being logged
+opt._FailsOnly = 0; // Change this to 1 to only see errors and failing tests
+opt._T = 0; // Change this to 1 to only see tests created using the jtest() function
+            // jtest demo: const x = (y,c)=>{ return y * c}; jtest("demo",demo(2,3),6)
+            // Firs parameter is description of test
+            // Second parameter is the function call with its arguments
+            // Third parameter of jtest is the expected answer
+opt._M = 0; // _M is a switch to turn on/off console log call stack. Use 0 for false and 1 for true
+opt._R = 0; // _R switch is turned on by 1 to run everything: logs, tests and function profilings and 0 to turn it off
+opt._F = 0; // _F switch is to turn on (1) or off(0) functions profilling function matrics
 
-function jimbaJive(youAndmeParams){ 
-   const msg = "...allnight gig";
-   return "...allnight gig";
-} 
-
-In order to profile this function do this : add tS() and tE() functions to beginning and end of functions.
-
-function jimbaJive(youAndmeParams){ 
-   tS("jimbaJive");
-   ...
-   ...
-   ...
-   const msg = "...allnight gig";
-   ...
-   ...
-   ...
-   tE("jimbaJive")
-   return "...allnight gig";
-}
-
-import { j, o, funcs,fails,passes,opt, tS, tE } from "./j";
-opt._R = true;
-
-j({walletAddress});
-✓ PASS walletAddress addr83843849494949
-
-o({skey});
-j.js:116 skey {skey: undefined}
-
-tS("Home");
-tE("Home");
-
-How about execution aggregates e.g. total failures or passes or total function calls?
-Use these 3 functions
-
-a) passes(); This function will display total PASSES in testing
-b) fails(); This function will display total FAILS e.g. null variables, empty, false, undefined etc
-c) funcs(); This function will dump and display functions and their repeated calls
-
-What about testing like libraries such as jest?
-
-
-Arrays testing:
-
-const arr1 = ["2","4","7"];
-
-const arr2 = ["2","1","7"];
-
-jtest("arrays",arr1,arr2);
-
-Object testing:
-
-const ag = {a:1,c:2,n:4}; 
-
-const bn = {a:1,c:2,n:4}; 
-
-jtest("objects",ag,bn);
-
-jtrics();
-
-TESTING : name
-j.js:320 X FAIL : Am expecting jame, but got james
-j.js:306 TESTING : number
-j.js:329 ✓ PASS : 7
-j.js:306 TESTING : bool
-j.js:342 ✓ PASS : true
-j.js:306 TESTING : arrays
-j.js:359 X FAIL : Am expecting 2,1,7, but got 2,4,7
-j.js:306 TESTING : objects
-j.js:262 {a: 1, c: 2, n: 4} {a: 1, c: 2, n: 4}
-j.js:368 ✓ PASS : [object Object]
+ 
 */
 
 export const opt = {
@@ -96,153 +35,80 @@ export const opt = {
     TOTAL_TESTS_FAIL :0,
     TOTAL_TESTS_RUN :0,
     TOTAL_WRONG_DATA_TYPES_PARAMS :0,
-    _R : false,
-    _J : false,
-    _T : false,
-    foff : false,
-    _O:false,
+    _R : 0,
+    _FailsOnly :0,
+    _T : 0,
+    _O : 0,
+    _M : 0,
+    _F : 0,
+    _Tc : 0,
+    _tNo : 20,
+    _Min : -100,
+    _Max : 100,
     _FUNCTIONS : [],
-    tS_ : true,
-    off:function(r){
-        if(r==0)
-        {
-            this._F = false;
-        }
-        else
-        {
-            this._F = true;
-        }
-            
-    }
-}
-
-export function j(o, r=0,g=false,gOff=false)
-{
-
-    //console.log(o)
-    let g_ = r;
-
-    const name = Object.keys(o)[0];
-    const value = Object.values(o)[0];
-
-    r = value;
-    o = name;
-
-    if (opt._R || opt._J == true)
-    {
-
-        if(Array.isArray(o))
-        {
-            console.log(o);
-            opt.off(g_);
-            return
-        }
-        if(g)
-        {
-            console.groupCollapsed("\%c"+o.toUpperCase() + " GROUP","background-color:darkgreen;color:#fff;");
-        }
-        let e = "%c\u2713 PASS " + o + " " + r ,
-            l = "%cX FAIL " + o + " " + function(r) 
-            {
-                if(typeof o == 'object')
-                {
-                    console.log(o) ;
-                    opt.off(g_);
-                    return                
-                }else if(opt._J == true){
-                    console.log("%c✓ PASS : " + name,"background-color:#fff;color:green;");opt.TOTAL_PASS++;
-                }
-                else
-                {
-                    opt.off(g_);
-                    return console.warn(o,r)
-                }               
-               
-            }(" ");
-        if (o && r)
-        {
-            if(typeof o == 'object')
-            {
-                console.log(o) ;
-                opt.off(g_);
-                return
-            }
-            else
-            {
-                (new Error).stack.toString().replace("Error", " ");
-                if(0 === o || o.toString().trim().length < 1 || o.toString().toLowerCase().includes("empty") || 0 === o || null === o || "0" === o || "null" === o || o.toString().includes("error") || e.toString().includes("undefined"))
-                {
-                        console.log(l, "background-color:#fff;color:red;");  opt.TOTAL_FAIL++;                
-                }
-                else
-                {        
-                (null, console.log(e, "background-color:#fff;color:green;")); opt.TOTAL_PASS++;
-                }
-            }
-        }else if(opt._J == true){
-            const name = Object.keys(o)[0];
-            console.log("%c✓ PASS : " + name,"background-color:#fff;color:green;");opt.TOTAL_PASS++;
-        }
-        else 
-        {
-            console.log(l, "background-color:#fff;color:red;");
-            opt.TOTAL_FAIL++;  
-        }
-
-        if(gOff)
-        {
-            console.groupEnd();
-        }      
-          
-    }
 }
 
 export function o(o,r=0)
 { 
-
-    if (opt._O || opt._R || !(r ==0))
-    {     
-        if((typeof o === 'object') ) 
+    
+    if(opt._O == 1 || opt._R == 1)
+    {
+        if(o == null || o == undefined || o == 0 || o == '')
         {
-           
-            if((Object.keys(o).length < 1))
-            {
-                console.log("%cX FAIL : OBJECT EMPTY", "background-color:darkred;color:#FFF;");
-                opt.TOTAL_FAIL++;
-                return
-            }
-            else
-            {
-                if((Object.keys(o).length == 1) && 
-                ((Object.values(o)[0].toString().trim().length == 0) ||(JSON.stringify(Object.values(o)[0]) =="{}") ||(JSON.stringify(Object.values(o)[0]) =="0")))
-                {
-                    const name = Object.keys(o)[0];
-                    console.log("%cX FAIL " + name, "background-color:red;color:#fff;")
-                    console.warn(name,o);
-                    opt.TOTAL_FAIL++;
-                    return
-                }
-                else
-                {
-     
-                    const name = Object.keys(o)[0];
-                    console.log("%c\u2713 PASS " + name, "background-color:darkgreen;color:#fff;")
-                    console.warn(name,o);
-                    opt.TOTAL_PASS++;
-                    return
-                }
-
-            }
-
+            console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+            console.trace(o);
         }
         else
         {
-            console.log("%cX FAIL : object is empty.","background-color:#fff;color:red;");opt.TOTAL_FAIL++;
-
+            if(typeof o == 'object' && o != null)
+            {
+                const name = Object.keys(o);  
+                const val = Object.values(o);  
+                if(val == '' || val == 0 || val == 'null' || val == 'undefined' || val == ['']) 
+                {
+                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                    console.info(o);
+                }
+                else
+                {
+                    if(opt._FailsOnly === 0)            
+                    {
+                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                        if(opt._M)
+                        {
+                            console.trace(o);
+                        }
+                        else
+                        {
+                            console.info(o);
+                        }
+                                            
+                    }
+                    
+                }
+            }
+            else
+            {             
+                if(((typeof o == 'number' && o > 0) || (typeof o == 'boolean' && o == true) || 
+                (typeof o == 'string' && o.trim().length > 0)))
+                {
+                    if(opt._FailsOnly === 0)               
+                    {
+                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                        console.info(o);
+                    } 
+                }
+                else
+                {
+                    console.log(o)
+                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                    console.trace(o);
+                }
+            }
+             
         }
-
     }
-
+    
 }
 
 export function tS(title="JIMBA",k=0)
@@ -253,7 +119,7 @@ export function tS(title="JIMBA",k=0)
         opt.tS_ = true;
     }   
  
-    if(title && (opt._R || !(k == 0)))
+    if(title && (opt._F || opt._R || !(k == 0)))
     {
         opt._FUNCTIONS.push(title);
 
@@ -265,7 +131,7 @@ export function tS(title="JIMBA",k=0)
 
 export function tE(title="JIMBA",k=0)
 {
-    if(title && (opt._R || !(k == 0)))
+    if(title && (opt._F || opt._R || !(k == 0)))
     {
         console.timeEnd("TIME : "+title);
 
@@ -286,7 +152,8 @@ export function tE(title="JIMBA",k=0)
 }
 
 function fails(k=0){
-    if(opt._T || opt._R || !(k == 0)){
+    if(opt. _O || opt._T ==1|| opt._R || !(k == 0))
+    {
         if(opt.TOTAL_FAIL > 0)
         {
             console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL,"background-color:#fff;color:darkred;");
@@ -296,7 +163,7 @@ function fails(k=0){
 }
 
 function passes(k=0){
-    if(opt._T || opt._R || !(k == 0))
+    if(opt. _O || opt._T ==1|| opt._R || !(k == 0))
     {
         if(opt.TOTAL_PASS > 0){
             console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS,"background-color:#fff;color:blue;");
@@ -306,7 +173,7 @@ function passes(k=0){
 }
 
 function funcs(k=0){
-    if((opt._T || opt._R || opt.tS_ ) && (!(k == 0) || (opt._FUNCTIONS.length > 0)))
+    if((opt. _O || opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt._FUNCTIONS.length > 0)))
     {
         const fT = opt._FUNCTIONS.length;
         console.log("%cTOTAL_FUNCTIONS : " + fT,"background-color:#fff;color:purple;");
@@ -319,29 +186,29 @@ function funcs(k=0){
 function tests(k=0){
 
    
-    if(opt._T == false){opt.tS_  = false;}
+    if(opt._T == 1){opt.tS_  = false;}
 
-    if((opt._T || opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_PASS > 0)))
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_PASS > 0)))
     {
         console.log("%cTOTAL_TESTS_PASS : " + opt.TOTAL_TESTS_PASS,"background-color:blue;color:#fff;"); 
     }
-    if((opt._T || opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_FAIL > 0)))
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_FAIL > 0)))
     {
-        console.log("%cTOTAL_TESTS_FAIL : " + opt.TOTAL_TESTS_FAIL,"background-color:blue;color:#fff;"); 
+        console.log("%cTOTAL_TESTS_FAIL : " + opt.TOTAL_TESTS_FAIL,"background-color:darkred;color:#fff;"); 
     }
-    if((opt._T || opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_RUN > 0)))
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_RUN > 0)))
     {
         console.log("%cTOTAL_TESTS_RUN : " + opt.TOTAL_TESTS_RUN,"background-color:blue;color:#fff;"); 
     }
-    if((opt._T || opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_WRONG_DATA_TYPES_PARAMS > 0)))
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_WRONG_DATA_TYPES_PARAMS > 0)))
     {
         console.log("%cTOTAL_WRONG_DATA_TYPES_PARAMS : " + opt.TOTAL_WRONG_DATA_TYPES_PARAMS,"background-color:blue;color:#fff;"); 
     }
 
 }
 
-export function jtrics(){
-    passes(),fails();funcs();tests();
+export function jtrics(k=0){
+    passes(k),fails(k);funcs(k);tests(k);
 }
 
 const compareArrays = (a, b) => {    
@@ -389,24 +256,110 @@ const compareArrays = (a, b) => {
 
   };
 
+export function gNo(min=opt._Min, max=opt._Max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function alphaNumericSymbolsString(length){
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_?|[]{}:",.!@#$%^&*()+~`';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < length) {
+          result += characters.charAt(Math.floor(Math.random() * charactersLength));
+          counter += 1;
+        }
+        return result;
+}
+
+function lowerCaseAlphabetString(length){
+    let result = '';
+    const characters = 'abcdefghijklmnopqrstuvwxyz';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;   
+}
+
+function upperCaseAlphabetString(length){
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;   
+}
+
+function onlyDigitsString(length){
+    let result = '';
+    const characters = '0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;   
+}
+
+function randomBoolean(){
+    return Math.random() < 0.5;
+}
+
 export function jtest(title,varString,expectedAnswer,k=0){
+
+    if(!title || !varString || !expectedAnswer)
+    {
+        if(opt._T == 1)
+        {
+            const trackcalls = (opt._Tc++)+" : "; 
+            console.log("%c"+trackcalls+" : TESTING " + title,"background-color:#fff;color:blue;");
+            opt.TOTAL_TESTS_FAIL++;
+            const res = varString?varString:" nothing.";    
+            console.log("%c"+title,"background-color:purple;color:white;")
+            console.log(varString);   
+            console.log(expectedAnswer);     
+            console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;        
+            return
+        }
+    }
+    
     opt.TOTAL_TESTS_RUN++;
 
-    if (opt._R || (k !== 0)||(opt._T == true))
+    if (opt._R || (k !== 0)||(opt._T == 1))
     {
         typeof varString === 'string';
 
-        console.log("%cTESTING : " + title,"background-color:#fff;color:blue;");
+        const trackcalls = (opt._Tc++)+" : "; 
+
+        console.log("%c"+trackcalls+" : TESTING " + title,"background-color:#fff;color:blue;");
 
         let results = "";
 
-        if(typeof varString === 'string' && typeof expectedAnswer === 'string')
+        if(varString === undefined || varString == null)
+        {
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : UNDEFINED!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+        }
+        else if(typeof varString === 'string' && typeof expectedAnswer === 'string')
         {
             results = varString.localeCompare(expectedAnswer);
 
             if(results === 0)
             {
-                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;"); opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;"); opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
             }
             else
             {   opt.TOTAL_TESTS_FAIL++;
@@ -420,7 +373,10 @@ export function jtest(title,varString,expectedAnswer,k=0){
 
             if(results === true)
             {
-                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
             }
             else
             {   
@@ -435,7 +391,10 @@ export function jtest(title,varString,expectedAnswer,k=0){
 
             if(results === true)
             {
-                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
             }
             else
             {   
@@ -450,7 +409,10 @@ export function jtest(title,varString,expectedAnswer,k=0){
 
             if(results === true)
             {
-                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                if(opt._FailsOnly === 0)
+                {
+                 console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;          
+                }
             }
             else
             {   
@@ -465,7 +427,10 @@ export function jtest(title,varString,expectedAnswer,k=0){
 
             if(results === true)
             {
-                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
             }
             else
             {   
@@ -473,7 +438,7 @@ export function jtest(title,varString,expectedAnswer,k=0){
                 const res = varString?varString:" nothing.";
                 console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
             }
-        }
+        }    
         else
         {   opt.TOTAL_WRONG_DATA_TYPES_PARAMS++;
             console.log(varString);
@@ -488,3 +453,5 @@ export function jtest(title,varString,expectedAnswer,k=0){
     }
 
 }
+
+
