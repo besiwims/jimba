@@ -87,3 +87,23 @@ const Home : NextPage = () => {
 console outputs:
 
 
+j.js:63 {hReadableAssests: '\r\n\r\nToken Name : \t\tVesting Key\r\nQty : \t\t\t1\r\nPolicy…92a\r\nAsset Name Encoded : \t56657374696e67204b6579'}
+j.js:56 ✓ PASS 
+j.js:63 {mph: MintingPolicyHash}
+j.js:323 3 :  : TESTING address
+j.js:358 ✓ PASS : 108
+j.js:323 4 :  : TESTING ada
+j.js:365 X FAIL : Am expecting 9 but got 8
+j.js:323 5 :  : TESTING walletAPI
+j.js:347 X FAIL : Am expecting b49258f836a82c98bf16af444da88e11a40a9eb623345a053d87a885aa8a3008 but got ca812e7b7ce9941a4e500484d6dc493b784b1fb89ccfb71d10e9ff2272472f56
+j.js:323 6 :  : TESTING walletHelper
+j.js:347 X FAIL : Am expecting addr_test1qz0hzxlrw5lwspvc9gpqll3ujpxyjmd5uylwqe8xdlt5d82ktxgu9qsyjahc67r53404t42p44vxv8hwhpdscw9l58jqktkm74 but got addr_test1qplmwkeprxsr32apq0mmddhs8la4a8556zss36te7h98ch0t0d9az20lyrcsm6za3gk4e6eefpy0w22745tvlw648pcs5m67rw
+j.js:323 7 :  : TESTING walletHandleNami
+j.js:412 ✓ PASS : [object Object]
+j.js:149 TOTAL_PASSES : 60
+j.js:139 TOTAL_ERRORS : 6
+j.js:159 TOTAL_FUNCTIONS : 2
+j.js:161 {assetsDisplayString: 2}
+j.js:173 TOTAL_TESTS_PASS : 4
+j.js:177 TOTAL_TESTS_FAIL : 4
+j.js:181 TOTAL_TESTS_RUN : 24
