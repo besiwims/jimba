@@ -1,542 +1,455 @@
-
-import LockAda from '../components/LockAda';
-i
-import {j,f,tm,dObject} from "./jimba"
-
 /*
-This is for demo purposes. It does not run. See how j() and tm() functions are used/called
-*/
-const Home: NextPage = (props : any) => {
+0. Version 1.1.1
+1. Library: Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library
+2. Author: Bernard Sibanda [Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd]
+3. License: MIT
+4. Date : 01-05-2024
+5. How to install: NPM -> for npm one has to run this command npm i jimba, for websites simple add the script tag to the j.js file. This means you copy the j.js file from github and add contents to the j.js
+6. Authour : Bernard Sibanda [Tobb Technologies, Women In Move Solutions]
 
-  const temp = {'age':90,'name':null}
+Installation using nodejs npm. On the vscode terminal run npm i jimba or npm i jimba --force if there are dependence issues
+Usage : The opt object is a collection of switches using 0 for false and any number say 1 for true
 
-  const art = [1,2,3]
-
-  const stringname = "bernrad"
-
-  const age = 60
-
-  j(temp+f(),"temp 17",1);
-
-  j(art+f(),"art 19",1);
-
-  j(stringname+f(),"stringname 21",1);
-
-  j(age+f(),"age 23",1);
-
-  const optimize = false;
-  const script = props.script as string;
-  const networkParamsUrl = process.env.NEXT_PUBLIC_NETWORK_PARAMS_URL as string;
-  const blockfrostAPI = process.env.NEXT_PUBLIC_BLOCKFROST_API as string;
-  const apiKey : string = process.env.NEXT_PUBLIC_BLOCKFROST_API_KEY as string;
-
-  j(apiKey+f(),"apiKey 31",1);
-
-  const nullVar = ""
-
-  j(nullVar+f(),"nullVar 35",1);
-
-  const nelliVa = undefined
-
-  j(nelliVa+f(),"nelliVa 39",1);
-
-  tm(!0,j,f,"A 41",dObject)
-
-  const [walletAPI, setWalletAPI] = useState<undefined | any>(undefined);
-  const [tx, setTx] = useState({ txId : '' });
-  const [threadToken, setThreadToken] = useState({ tt : '' });
-  const [walletInfo, setWalletInfo] = useState({ balance : ''});
-  const [walletIsEnabled, setWalletIsEnabled] = useState(false);
-  const [whichWalletSelected, setWhichWalletSelected] = useState(undefined);
-
-  useEffect(() => {
-    const checkWallet = async () => {
-
-      setWalletIsEnabled(await checkIfWalletFound());
-    }
-    checkWallet();
-  }, [whichWalletSelected]);
-
-  useEffect(() => {
-    const enableSelectedWallet = async () => {
-      if (walletIsEnabled) {
-        const api = await enableWallet();
-        setWalletAPI(api);
-      }
-    }
-    enableSelectedWallet();
-  }, [walletIsEnabled]);
-
-  useEffect(() => {
-    const updateWalletInfo = async () => {
-
-        if (walletIsEnabled) {
-            const _balance = await getBalance() as string;
-            setWalletInfo({
-              ...walletInfo,
-              balance : _balance
-            });
-        }
-    }
-    updateWalletInfo();
-  }, [walletAPI]);
+import {opt,jtest,jtrics,o,tS,tE } from 'jimba'; //use this at the top page
+opt._O = 0; // console.log the variable, array, or object using function o() as follows: 
+            // const varDemo = "jimba demo"; o({varDemo})
+            // Please note the the o() parameter takes object so always add the {} around your variable
+            // this will help tell you the name of item being logged
+opt._FailsOnly = 0; // Change this to 1 to only see errors and failing tests
+opt._T = 0; // Change this to 1 to only see tests created using the jtest() function
+            // jtest demo: const x = (y,c)=>{ return y * c}; jtest("demo",demo(2,3),6)
+            // Firs parameter is description of test
+            // Second parameter is the function call with its arguments
+            // Third parameter of jtest is the expected answer
+opt._M = 0; // _M is a switch to turn on/off console log call stack. Use 0 for false and 1 for true
+opt._R = 0; // _R switch is turned on by 1 to run everything: logs, tests and function profilings and 0 to turn it off
+opt._F = 0; // _F switch is to turn on (1) or off(0) functions profilling function matrics
 
  
-  // user selects what wallet to connect to
-  const handleWalletSelect = (obj : any) => {
-    const whichWalletSelected = obj.target.value
-    setWhichWalletSelected(whichWalletSelected);
-  }
-
-  const checkIfWalletFound = async () => {
-
-    let walletFound = false;
-
-    const walletChoice = whichWalletSelected;
-    if (walletChoice === "nami") {
-        walletFound = !!window?.cardano?.nami;
-    } else if (walletChoice === "eternl") {
-        walletFound = !!window?.cardano?.eternl;
-    }
-    return walletFound;
-  }
-
-  const enableWallet = async () => {
-
-    try {
-      const walletChoice = whichWalletSelected;
-      if (walletChoice === "nami") {
-          const handle: Cip30Handle = await window.cardano.nami.enable();
-          const walletAPI = new Cip30Wallet(handle);
-          return walletAPI;
-        } else if (walletChoice === "eternl") {
-          const handle: Cip30Handle = await window.cardano.eternl.enable();
-          const walletAPI = new Cip30Wallet(handle);
-          return walletAPI;
-        }
-    } catch (err) {
-        console.log('enableWallet error', err);
-    }
-  }
-
-  const getBalance = async () => {
-    try {
-        const walletHelper = new WalletHelper(walletAPI);
-        const balanceAmountValue  = await walletHelper.calcBalance();
-        const balanceAmount = balanceAmountValue.lovelace;
-        const walletBalance : BigInt = BigInt(balanceAmount);
-        return walletBalance.toLocaleString();
-    } catch (err) {
-        console.log('getBalance error: ', err);
-    }
-  }
-
-  const lockAda = async (params : any) => {
-
-
-
-    // Re-enable wallet API since wallet account may have been changed
-    const api = await enableWallet();
-    setWalletAPI(api);
-
-    const benAddr = params[0] as string;
-    const adaQty = params[1] as number;
-    const dueDate = params[2] as string;
-    const deadline = new Date(dueDate + "T00:00");
-
-    const benPkh = Address.fromBech32(benAddr).pubKeyHash;
-    const lovelaceAmt = Number(adaQty) * 1000000;
-    const maxTxFee: number = 500000; // maximum estimated transaction fee
-    const minChangeAmt: number = 1000000; // minimum lovelace needed to be sent back as change
-    const adaAmountVal = new Value(BigInt(lovelaceAmt));
-    const minUTXOVal = new Value(BigInt(lovelaceAmt + maxTxFee + minChangeAmt));
-
-    // Get wallet UTXOs
-    const walletHelper = new WalletHelper(walletAPI);
-    const utxos = await walletHelper.pickUtxos(minUTXOVal);
-
-    // Get change address
-    const changeAddr = await walletHelper.changeAddress;
-
-    // Determine the UTXO used for collateral
-    const colatUtxo = await walletHelper.pickCollateral();
-
-    // Compile the Helios script
-    const compiledScript = Program.new(script).compile(optimize);
-
-    // Extract the validator script address
-    const valAddr = Address.fromValidatorHash(compiledScript.validatorHash);
-
-    // Use the change address to derive the owner pkh
-    const ownerPkh = changeAddr.pubKeyHash;
-
-    // Construct the datum
-    const datum = new ListData([  new ByteArrayData(ownerPkh.bytes),
-                                  new ByteArrayData(benPkh.bytes),
-                                  new IntData(BigInt(deadline.getTime()))
-                                ]);
-
-    const inlineDatum = Datum.inline(datum);
-
-    // Start building the transaction
-    const tx = new Tx();
-
-    // Add the UTXO as inputs
-    tx.addInputs(utxos[0]);
-
-    const mintScript =`minting nft
-
-    const TX_ID: ByteArray = #` + utxos[0][0].txId.hex + `
-    const txId: TxId = TxId::new(TX_ID)
-    const outputId: TxOutputId = TxOutputId::new(txId, ` + utxos[0][0].utxoIdx + `)
-    
-    func main(ctx: ScriptContext) -> Bool {
-        tx: Tx = ctx.tx;
-        mph: MintingPolicyHash = ctx.get_current_minting_policy_hash();
-    
-        assetclass: AssetClass = AssetClass::new(
-            mph, 
-            "Vesting Key".encode_utf8()
-        );
-        value_minted: Value = tx.minted;
-    
-        // Validator logic starts
-        (value_minted == Value::new(assetclass, 1)).trace("NFT1: ") &&
-        tx.inputs.any((input: TxInput) -> Bool {
-                                        (input.output_id == outputId).trace("NFT2: ")
-                                        }
-        )
-    }`
-
-    // Compile the helios minting script
-    const mintProgram = Program.new(mintScript).compile(optimize);
-
-    // Add the script as a witness to the transaction
-    tx.attachScript(mintProgram);
-
-    // Construct the NFT that we will want to send as an output
-    const nftTokenName = ByteArrayData.fromString("Vesting Key").toHex();
-    const tokens: [number[], bigint][] = [[hexToBytes(nftTokenName), BigInt(1)]];
-
-    // Create an empty Redeemer because we must always send a Redeemer with
-    // a plutus script transaction even if we don't actually use it.
-    const mintRedeemer = new ConstrData(0, []);
-
-    // Indicate the minting we want to include as part of this transaction
-    tx.mintTokens(
-      mintProgram.mintingPolicyHash,
-      tokens,
-      mintRedeemer
-    )
-
-    const lockedVal = new Value(adaAmountVal.lovelace, new Assets([[mintProgram.mintingPolicyHash, tokens]]));
-
-    // Add the destination address and the amount of Ada to lock including a datum
-    tx.addOutput(new TxOutput(valAddr, lockedVal, inlineDatum));
-
-    // Add the collateral
-    tx.addCollateral(colatUtxo);
-
-    const networkParams = new NetworkParams(
-      await fetch(networkParamsUrl)
-          .then(response => response.json())
-    )
-    console.log("tx before final", tx.dump());
-
-    // Send any change back to the buyer
-    await tx.finalize(networkParams, changeAddr);
-    console.log("tx after final", tx.dump());
-
-    console.log("Verifying signature...");
-    const signatures = await walletAPI.signTx(tx);
-    tx.addSignatures(signatures);
-
-    console.log("Submitting transaction...");
-    const txHash = await walletAPI.submitTx(tx);
-
-    console.log("txHash", txHash.hex);
-    setTx({ txId: txHash.hex });
-    setThreadToken({ tt: mintProgram.mintingPolicyHash.hex });
-  }
-
-  tm(0,j,f,"A 260",dObject)
-
-  // Get the utxo with the vesting key token at the script address
-  const getKeyUtxo = async (scriptAddress : string, keyMPH : string, keyName : string ) => {
-
-    console.log("getKeyUTXO:keyMPH", keyMPH);
-    console.log("getKeyUTXO:keyName", keyName);
-
-    const blockfrostUrl : string = blockfrostAPI + "/addresses/" + scriptAddress + "/utxos/" + keyMPH + keyName;
-    console.log("blockfrost url", blockfrostUrl);
-
-    let resp = await fetch(blockfrostUrl, {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        project_id: apiKey,
-      },
-    });
-
-    if (resp?.status > 299) {
-      throw console.error("vesting key token not found", resp);
-    }
-    const payload = await resp.json();
-
-    if (payload.length == 0) {
-      throw console.error("vesting key token not found");
-    }
-    const lovelaceAmount = payload[0].amount[0].quantity;
-    const mph = MintingPolicyHash.fromHex(keyMPH);
-    const tokenName = hexToBytes(keyName);
-
-    const value = new Value(BigInt(lovelaceAmount), new Assets([
-        [mph, [
-            [tokenName, BigInt(1)],
-        ]]
-    ]));
-
-    return new UTxO(
-      TxId.fromHex(payload[0].tx_hash),
-      BigInt(payload[0].output_index),
-      new TxOutput(
-        Address.fromBech32(scriptAddress),
-        value,
-        Datum.inline(ListData.fromCbor(hexToBytes(payload[0].inline_datum)))
-      )
-    );
-  }
-
-  const claimFunds = async (params : any) => {
-
-    // Re-enable wallet API since wallet account may have been changed
-    const api = await enableWallet();
-    setWalletAPI(api);
-
-    const keyMPH = params[0] as string;
-    const minAda : number = 2000000; // minimum lovelace needed to send an NFT
-    const maxTxFee: number = 500000; // maximum estimated transaction fee
-    const minChangeAmt: number = 1000000; // minimum lovelace needed to be sent back as change
-    const minUTXOVal = new Value(BigInt(minAda + maxTxFee + minChangeAmt));
-
-    // Get wallet UTXOs
-    const walletHelper = new WalletHelper(walletAPI);
-    const utxos = await walletHelper.pickUtxos(minUTXOVal);
-
-    // Get change address
-    const changeAddr = await walletHelper.changeAddress;
-
-    // Determine the UTXO used for collateral
-    const colatUtxo = await walletHelper.pickCollateral();
-
-    // Compile the Helios script
-    const compiledScript = Program.new(script).compile(optimize);
-
-    // Extract the validator script address
-    const valAddr = Address.fromValidatorHash(compiledScript.validatorHash);
-
-    // Use the change address as the claimer address
-    const claimAddress = changeAddr;
-
-    // Start building the transaction
-    const tx = new Tx();
-
-    // Add UTXO inputs
-    tx.addInputs(utxos[0]);
-
-    // Create the Claim redeemer to spend the UTXO locked
-    // at the script address
-    const valRedeemer = new ConstrData(1, []);
-
-    // Get the UTXO that has the vesting key token in it
-    const valUtxo = await getKeyUtxo(valAddr.toBech32(), keyMPH, ByteArrayData.fromString("Vesting Key").toHex());
-    tx.addInput(valUtxo, valRedeemer);
-
-    // Send the value of the of the valUTXO to the recipient
-    tx.addOutput(new TxOutput(claimAddress, valUtxo.value));
-
-    // Specify when this transaction is valid from.   This is needed so
-    // time is included in the transaction which will be use by the validator
-    // script.  Add two hours for time to live and offset the current time
-    // by 5 mins.
-    const currentTime = new Date().getTime();
-    const earlierTime = new Date(currentTime - 5 * 60 * 1000);
-    const laterTime = new Date(currentTime + 2 * 60 * 60 * 1000);
-
-    tx.validFrom(earlierTime);
-    tx.validTo(laterTime);
-
-    // Add the recipients pkh
-    tx.addSigner(claimAddress.pubKeyHash);
-
-    // Add the validator script to the transaction
-    tx.attachScript(compiledScript);
-
-    // Add the collateral
-    tx.addCollateral(colatUtxo);
-
-    const networkParams = new NetworkParams(
-      await fetch(networkParamsUrl)
-          .then(response => response.json())
-    )
-    console.log("tx before final", tx.dump());
-
-    // Send any change back to the buyer
-    await tx.finalize(networkParams, changeAddr);
-    console.log("tx after final", tx.dump());
-
-    console.log("Verifying signature...");
-    const signatures = await walletAPI.signTx(tx);
-    tx.addSignatures(signatures);
-
-    console.log("Submitting transaction...");
-    const txHash = await walletAPI.submitTx(tx);
-
-    console.log("txHash", txHash.hex);
-    setTx({ txId: txHash.hex });
-  }
-
-  const cancelVesting = async (params : any) => {
-
-    // Re-enable wallet API since wallet account may have been changed
-    const api = await enableWallet();
-    setWalletAPI(api);
-    
-    const keyMPH = params[0] as string;
-    const minAda : number = 2000000; // minimum lovelace needed to send an NFT
-    const maxTxFee: number = 500000; // maximum estimated transaction fee
-    const minChangeAmt: number = 1000000; // minimum lovelace needed to be sent back as change
-    const minUTXOVal = new Value(BigInt(minAda + maxTxFee + minChangeAmt));
-
-    // Get wallet UTXOs
-    const walletHelper = new WalletHelper(walletAPI);
-    const utxos = await walletHelper.pickUtxos(minUTXOVal);
-
-    // Get change address
-    const changeAddr = await walletHelper.changeAddress;
-
-    // Determine the UTXO used for collateral
-    const colatUtxo = await walletHelper.pickCollateral();
-
-    // Compile the Helios script
-    const compiledScript = Program.new(script).compile(optimize);
-
-    // Extract the validator script address
-    const valAddr = Address.fromValidatorHash(compiledScript.validatorHash);
-
-    // Use the change address as the owner address
-    const ownerAddress = changeAddr;
-
-    // Start building the transaction
-    const tx = new Tx();
-    tx.addInputs(utxos[0]);
-
-    // Create the Cancel redeemer to spend the UTXO locked
-    // at the script address
-    const valRedeemer = new ConstrData(0, []);
-
-    // Get the UTXO that has the vesting key token in it
-    const valUtxo = await getKeyUtxo(valAddr.toBech32(), keyMPH, ByteArrayData.fromString("Vesting Key").toHex());
-    tx.addInput(valUtxo, valRedeemer);
-
-    // Send the value of the of the valUTXO back to the owner
-    tx.addOutput(new TxOutput(ownerAddress, valUtxo.value));
-
-    // Specify when this transaction is valid from.   This is needed so
-    // time is included in the transaction which will be use by the validator
-    // script.  Add two hours for time to live and offset the current time
-    // by 5 mins.
-    const currentTime = new Date().getTime();
-    const earlierTime = new Date(currentTime - 5 * 60 * 1000);
-    const laterTime = new Date(currentTime + 2 * 60 * 60 * 1000);
-
-    tx.validFrom(earlierTime);
-    tx.validTo(laterTime);
-
-    // Add the recipiants pkh
-    tx.addSigner(ownerAddress.pubKeyHash);
-
-    // Add the validator script to the transaction
-    tx.attachScript(compiledScript);
-
-    // Add the collateral
-    tx.addCollateral(colatUtxo);
-
-    const networkParams = new NetworkParams(
-      await fetch(networkParamsUrl)
-          .then(response => response.json())
-    )
-    console.log("tx before final", tx.dump());
-
-    // Send any change back to the buyer
-    await tx.finalize(networkParams, changeAddr);
-    console.log("tx after final", tx.dump());
-
-    console.log("Verifying signature...");
-    const signatures = await walletAPI.signTx(tx);
-    tx.addSignatures(signatures);
-
-    console.log("Submitting transaction...");
-    const txHash = await walletAPI.submitTx(tx);
-
-    console.log("txHash", txHash.hex);
-    setTx({ txId: txHash.hex });
-  }
-
-
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Helios Tx Builder</title>
-        <meta name="description" content="Littercoin web tools page" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h3 className={styles.title}>
-          Helios Tx Builder
-        </h3>
-
-        <div className={styles.borderwallet}>
-            <p>
-              Connect to your wallet
-            </p>
-            <p className={styles.borderwallet}>
-              <input type="radio" id="nami" name="wallet" value="nami" onChange={handleWalletSelect}/>
-                <label>Nami</label>
-            </p>
-            <p className={styles.borderwallet}>
-                <input type="radio" id="eternl" name="wallet" value="eternl" onChange={handleWalletSelect}/>
-                <label>Eternl</label>
-            </p>
-          </div>
-          <div className={styles.borderwallet}>
-            View Smart Contract:  &nbsp;  &nbsp;
-            <a href="/api/vesting" target="_blank" rel="noopener noreferrer">vesting.hl</a>
-          </div>
-          {!tx.txId && walletIsEnabled && <div className={styles.border}><WalletInfo walletInfo={walletInfo}/></div>}
-          {tx.txId && <div className={styles.border}><b>Transaction Success!!!</b>
-          <p>TxId &nbsp;&nbsp;<a href={"https://preprod.cexplorer.io/tx/" + tx.txId} target="_blank" rel="noopener noreferrer" >{tx.txId}</a></p>
-          <p>Please wait until the transaction is confirmed on the blockchain and reload this page before doing another transaction</p>
-          <p></p>
-          </div>}
-          {threadToken.tt && <div className={styles.border}>
-          <p>Please copy and save your vesting key</p>
-          <b><p>{threadToken.tt}</p></b>
-          <p>You will need this key to unlock your funds</p>
-          </div>}
-
-          {walletIsEnabled && !tx.txId && <div className={styles.border}><LockAda onLockAda={lockAda}/></div>}
-          {walletIsEnabled && !tx.txId && <div className={styles.border}><ClaimFunds onClaimFunds={claimFunds}/></div>}
-          {walletIsEnabled && !tx.txId && <div className={styles.border}><CancelVesting onCancelVesting={cancelVesting}/></div>}
-
-      </main>
-
-      <footer className={styles.footer}>
-
-      </footer>
-    </div>
-  )
+*/
+
+export const opt = {
+    TOTAL_FAIL : 0,
+    TOTAL_PASS : 0,
+    TOTAL_TESTS_PASS :0,
+    TOTAL_TESTS_FAIL :0,
+    TOTAL_TESTS_RUN :0,
+    TOTAL_WRONG_DATA_TYPES_PARAMS :0,
+    _R : 0,
+    _FailsOnly :0,
+    _T : 0,
+    _O : 0,
+    _M : 0,
+    _F : 0,
+    _Tc : 0,
+    _tNo : 20,
+    _Min : -100,
+    _Max : 100,
+    _FUNCTIONS : [],
 }
 
-export default Home
+export function o(o,r=0)
+{ 
+    
+    if(opt._O == 1 || opt._R == 1)
+    {
+        if(o == null || o == undefined || o == 0 || o == '')
+        {
+            console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+            console.trace(o);
+        }
+        else
+        {
+            if(typeof o == 'object' && o != null)
+            {
+                const name = Object.keys(o);  
+                const val = Object.values(o);  
+                if(val == '' || val == 0 || val == 'null' || val == 'undefined' || val == ['']) 
+                {
+                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                    console.info(o);
+                }
+                else
+                {
+                    if(opt._FailsOnly === 0)            
+                    {
+                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                        if(opt._M)
+                        {
+                            console.trace(o);
+                        }
+                        else
+                        {
+                            console.info(o);
+                        }
+                                            
+                    }
+                    
+                }
+            }
+            else
+            {             
+                if(((typeof o == 'number' && o > 0) || (typeof o == 'boolean' && o == true) || 
+                (typeof o == 'string' && o.trim().length > 0)))
+                {
+                    if(opt._FailsOnly === 0)               
+                    {
+                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                        console.info(o);
+                    } 
+                }
+                else
+                {
+                    console.log(o)
+                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                    console.trace(o);
+                }
+            }
+             
+        }
+    }
+    
+}
+
+export function tS(title="JIMBA",k=0)
+{
+
+    if(!(k == 0))
+    {
+        opt.tS_ = true;
+    }   
+ 
+    if(title && (opt._F || opt._R || !(k == 0)))
+    {
+        opt._FUNCTIONS.push(title);
+
+        console.log( opt._FUNCTIONS)
+
+        console.time("TIME : "+title);       
+    }
+}
+
+export function tE(title="JIMBA",k=0)
+{
+    if(title && (opt._F || opt._R || !(k == 0)))
+    {
+        console.timeEnd("TIME : "+title);
+
+        if(opt.TOTAL_FAIL > 0)
+        {
+            console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL,"background-color:#fff;color:darkred;");
+        }
+        if(opt.TOTAL_PASS > 0)
+        {
+            console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS,"background-color:#fff;color:blue;");
+        }
+
+        funcs()
+        
+        opt.tS_ = false;
+        
+    }
+}
+
+function fails(k=0){
+    if(opt. _O || opt._T ==1|| opt._R || !(k == 0))
+    {
+        if(opt.TOTAL_FAIL > 0)
+        {
+            console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL,"background-color:#fff;color:darkred;");
+        }
+    }
+    
+}
+
+function passes(k=0){
+    if(opt. _O || opt._T ==1|| opt._R || !(k == 0))
+    {
+        if(opt.TOTAL_PASS > 0){
+            console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS,"background-color:#fff;color:blue;");
+        }
+    }
+    
+}
+
+function funcs(k=0){
+    if((opt. _O || opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt._FUNCTIONS.length > 0)))
+    {
+        const fT = opt._FUNCTIONS.length;
+        console.log("%cTOTAL_FUNCTIONS : " + fT,"background-color:#fff;color:purple;");
+        const funcs_ = opt._FUNCTIONS.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
+        console.log(funcs_);
+    }
+
+}
+
+function tests(k=0){
+
+   
+    if(opt._T == 1){opt.tS_  = false;}
+
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_PASS > 0)))
+    {
+        console.log("%cTOTAL_TESTS_PASS : " + opt.TOTAL_TESTS_PASS,"background-color:blue;color:#fff;"); 
+    }
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_FAIL > 0)))
+    {
+        console.log("%cTOTAL_TESTS_FAIL : " + opt.TOTAL_TESTS_FAIL,"background-color:darkred;color:#fff;"); 
+    }
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_TESTS_RUN > 0)))
+    {
+        console.log("%cTOTAL_TESTS_RUN : " + opt.TOTAL_TESTS_RUN,"background-color:blue;color:#fff;"); 
+    }
+    if((opt._T ==1|| opt._R || opt.tS_ ) && (!(k == 0) || (opt.TOTAL_WRONG_DATA_TYPES_PARAMS > 0)))
+    {
+        console.log("%cTOTAL_WRONG_DATA_TYPES_PARAMS : " + opt.TOTAL_WRONG_DATA_TYPES_PARAMS,"background-color:blue;color:#fff;"); 
+    }
+
+}
+
+export function jtrics(k=0){
+    passes(k),fails(k);funcs(k);tests(k);
+}
+
+const compareArrays = (a, b) => {    
+    return JSON.stringify(a) === JSON.stringify(b);
+  };
+
+  const compareObjects = (a, b) => {    
+
+    if(typeof a == 'object' && typeof b == 'object' ){
+
+        const aObjElementTotal = a.length;
+        const bObjElementTotal = a.length;
+
+        const objTotalSame = aObjElementTotal === bObjElementTotal;
+
+        if(!objTotalSame){
+            return false;
+        }
+        else{
+                const  aKeysArray = Object.keys(a);
+                const aKeysArraySorted = aKeysArray.sort();
+                const  aValuesArray = Object.keys(a);
+                const aValuesArraySorted = aValuesArray.sort();
+
+                const  bKeysArray = Object.keys(b);
+                const bKeysArraySorted = bKeysArray.sort();
+                const  bValuesArray = Object.keys(b);
+                const bValuesArraySorted = bValuesArray.sort();
+
+                if(compareArrays(aKeysArraySorted,bKeysArraySorted) && compareArrays(aValuesArraySorted,bValuesArraySorted))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+        }    
+
+    }
+    else{
+        return false;
+    }
+
+  };
+
+export function gNo(min=opt._Min, max=opt._Max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function alphaNumericSymbolsString(length){
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_?|[]{}:",.!@#$%^&*()+~`';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < length) {
+          result += characters.charAt(Math.floor(Math.random() * charactersLength));
+          counter += 1;
+        }
+        return result;
+}
+
+function lowerCaseAlphabetString(length){
+    let result = '';
+    const characters = 'abcdefghijklmnopqrstuvwxyz';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;   
+}
+
+function upperCaseAlphabetString(length){
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;   
+}
+
+function onlyDigitsString(length){
+    let result = '';
+    const characters = '0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;   
+}
+
+function randomBoolean(){
+    return Math.random() < 0.5;
+}
+
+export function jtest(title,varString,expectedAnswer,k=0){
+
+    if(!title || !varString || !expectedAnswer)
+    {
+        if(opt._T == 1)
+        {
+            const trackcalls = (opt._Tc++)+" : "; 
+            console.log("%c"+trackcalls+" : TESTING " + title,"background-color:#fff;color:blue;");
+            opt.TOTAL_TESTS_FAIL++;
+            const res = varString?varString:" nothing.";    
+            console.log("%c"+title,"background-color:purple;color:white;")
+            console.log(varString);   
+            console.log(expectedAnswer);     
+            console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;        
+            return
+        }
+    }
+    
+    opt.TOTAL_TESTS_RUN++;
+
+    if (opt._R || (k !== 0)||(opt._T == 1))
+    {
+        typeof varString === 'string';
+
+        const trackcalls = (opt._Tc++)+" : "; 
+
+        console.log("%c"+trackcalls+" : TESTING " + title,"background-color:#fff;color:blue;");
+
+        let results = "";
+
+        if(varString === undefined || varString == null)
+        {
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : UNDEFINED!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+        }
+        else if(typeof varString === 'string' && typeof expectedAnswer === 'string')
+        {
+            results = varString.localeCompare(expectedAnswer);
+
+            if(results === 0)
+            {
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;"); opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
+            }
+            else
+            {   opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            }
+        }
+        else if(typeof varString === 'number' && typeof expectedAnswer === 'number')
+        {
+            results = varString === expectedAnswer;
+
+            if(results === true)
+            {
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
+            }
+            else
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            }
+        }
+        else if(typeof varString === 'boolean' && typeof expectedAnswer === 'boolean')
+        {
+            results = varString === expectedAnswer;
+
+            if(results === true)
+            {
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
+            }
+            else
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            }
+        }
+        else if(Array.isArray(varString) && Array.isArray(expectedAnswer))
+        {
+            results = compareArrays(varString, expectedAnswer);
+
+            if(results === true)
+            {
+                if(opt._FailsOnly === 0)
+                {
+                 console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;          
+                }
+            }
+            else
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            }
+        }
+        else if(typeof varString === 'object' && typeof expectedAnswer === 'object')
+        {
+            results = compareObjects(varString,expectedAnswer);
+
+            if(results === true)
+            {
+                if(opt._FailsOnly === 0)
+                {
+                    console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                }
+            }
+            else
+            {   
+                opt.TOTAL_TESTS_FAIL++;
+                const res = varString?varString:" nothing.";
+                console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+            }
+        }    
+        else
+        {   opt.TOTAL_WRONG_DATA_TYPES_PARAMS++;
+            console.log(varString);
+            console.log(expectedAnswer);
+            console.log("%c WRONG DATA TYPES GIVEN! First param is of : " + typeof varString + ", Second param is of : " + typeof expectedAnswer,"background-color:#fff;color:red;");
+        }
+        
+    }
+    else
+    {
+        //
+    }
+
+}
