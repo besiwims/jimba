@@ -1,5 +1,5 @@
 /*
-0. Version 1.1.3
+0. Version 1.1.5
 1. Library: Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library
 2. Author: Bernard Sibanda [Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd]
 3. License: MIT
@@ -39,7 +39,35 @@ opt._R = 0; // _R switch is turned on by 1 to run everything: logs, tests and fu
 opt._F = 0; // _F switch is to turn on (1) or off(0) functions profilling function matrics
 
  github link https://github.com/besiwims/jimba/tree/main
- 
+
+ Added abitrary value generators to improve testing numbers, strings and booleans 07-05-2024
+
+ import {opt,jtest,jtrics,o,tS,tE,gAlphaNumericSymbolsString,gBoolean,gLowerCaseAlphabetString,
+  gNo,gNull,gOnlyDigitsString,gUpperCaseAlphabetString } from 'jimba';
+opt._O = 1;
+opt._FailsOnly = 0;
+opt._T = 1;
+opt._M = 0;
+opt._R = 1;
+opt._F = 1;
+opt._tNo= 10;
+
+ for (let i = 0; i < opt._tNo; i++) {
+   const num: number = gNo();
+   const n: any= gNull(); o(n); //testing gNull which generates all types of nulls
+   const gAlphaNumericSymbolsString_: any= gAlphaNumericSymbolsString(); o(gAlphaNumericSymbolsString_); //
+   const gBoolean_: any= gBoolean(); o({gBoolean_}); //
+   const gLowerCaseAlphabetString_: any= gLowerCaseAlphabetString(); o({gLowerCaseAlphabetString_}); //
+   const gOnlyDigitsString_: any= gOnlyDigitsString(); o({gOnlyDigitsString_}); //
+   const gUpperCaseAlphabetString_: any= gUpperCaseAlphabetString(); o({gUpperCaseAlphabetString_}); //
+  }
+  
+ jtrics()
+
+ NOTE: The function o() must be used without {} in order to catch more null values. The problem is the fails will not 
+ give the description of failed variables or objects.E.g. o()
+ This means that if one needs to see descriptions then the user must use the {} e.g. o({})
+ Best rule is always try both and o() catches more errors especially with nexted objects whose first elements are null.
 */
 
 export const opt = {
@@ -64,6 +92,99 @@ export const opt = {
 
 export function o(o,r=0)
 { 
+
+    
+    if(opt._O == 1 || opt._R == 1)
+    {
+        if(o == null || o == undefined || o == 0 || o == '')
+        {
+            console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+            console.trace(o);
+        }
+        else
+        {
+            if(typeof o == 'object' && o != null)
+            {
+                const name = Object.keys(o);  
+                const val = Object.values(o);  
+                if(val == '' || val == 0 || val == 'null' || val == 'undefined' || val == ['']) 
+                {
+                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                    console.info(o);
+                }
+                else
+                {
+                    if(opt._FailsOnly === 0)            
+                    {                        
+                        const nesteddValue_ = Object.values(o);
+                        if(nesteddValue_){
+                            const nesteddValue = Object.values(nesteddValue_);
+                            const st = JSON.stringify(Object.values(nesteddValue));
+                            if(!(st === "[{}]")){
+                                console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                                if(opt._M)
+                                {
+                                    console.trace(o);
+                                }
+                                else
+                                {
+                                    console.info(o);
+                                }
+                            }
+                            else{
+                                console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                                if(opt._M)
+                                {
+                                    console.trace(o);
+                                }
+                                else
+                                {
+                                    console.info(o);
+                                }
+                            }
+                        }else{
+                            console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                            if(opt._M)
+                            {
+                                console.trace(o);
+                            }
+                            else
+                            {
+                                console.info(o);
+                            }
+                        }
+                                           
+                    }
+                    
+                }
+            }
+            else
+            {             
+                if(((typeof o == 'number' && o > 0) || (typeof o == 'boolean' && o == true) || 
+                (typeof o == 'string' && o.trim().length > 0)))
+                {
+                    if(opt._FailsOnly === 0)               
+                    {
+                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                        console.info(o);
+                    } 
+                }
+                else
+                {
+                    console.log(o)
+                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                    console.trace(o);
+                }
+            }
+             
+        }
+    }
+    
+}
+
+export function oo(o,r=0)
+{ 
+
     
     if(opt._O == 1 || opt._R == 1)
     {
@@ -124,7 +245,6 @@ export function o(o,r=0)
     }
     
 }
-
 export function tS(title="JIMBA",k=0)
 {
 
@@ -276,7 +396,7 @@ export function gNo(min=opt._Min, max=opt._Max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function alphaNumericSymbolsString(length){
+export function gAlphaNumericSymbolsString(length=10){
         let result = '';
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_?|[]{}:",.!@#$%^&*()+~`';
         const charactersLength = characters.length;
@@ -288,7 +408,7 @@ function alphaNumericSymbolsString(length){
         return result;
 }
 
-function lowerCaseAlphabetString(length){
+export function gLowerCaseAlphabetString(length=10){
     let result = '';
     const characters = 'abcdefghijklmnopqrstuvwxyz';
     const charactersLength = characters.length;
@@ -300,7 +420,7 @@ function lowerCaseAlphabetString(length){
     return result;   
 }
 
-function upperCaseAlphabetString(length){
+export function gUpperCaseAlphabetString(length=10){
     let result = '';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const charactersLength = characters.length;
@@ -312,7 +432,7 @@ function upperCaseAlphabetString(length){
     return result;   
 }
 
-function onlyDigitsString(length){
+export function gOnlyDigitsString(length=10){
     let result = '';
     const characters = '0123456789';
     const charactersLength = characters.length;
@@ -324,8 +444,14 @@ function onlyDigitsString(length){
     return result;   
 }
 
-function randomBoolean(){
+export function gBoolean(){
     return Math.random() < 0.5;
+}
+
+export function gNull(){
+    const negativeNo = gNo(-1000,-1);
+    const nulls = [{empty:null},{empty:undefined},{empty:"null"},{empty:"undefined"},,null, undefined,0,'',"",{empty:[0]},{empty:""},{empty:''},{empty:"0"},{empty:0},{empty:[]},{empty:{}},[0],[],[''],[""],{},negativeNo];
+    return nulls[Math.floor(Math.random()*nulls.length)];
 }
 
 export function jtest(title,varString,expectedAnswer,k=0){
