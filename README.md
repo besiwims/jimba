@@ -40,7 +40,7 @@ opt._F = 0; // _F switch is to turn on (1) or off(0) functions profilling functi
  github link https://github.com/besiwims/jimba/tree/main
 
  Added abitrary value generators to improve testing numbers, strings and booleans 07-05-2024
-
+```
  import {opt,jtest,jtrics,o,tS,tE,gAlphaNumericSymbolsString,gBoolean,gLowerCaseAlphabetString,
   gNo,gNull,gOnlyDigitsString,gUpperCaseAlphabetString } from 'jimba';
   
@@ -76,6 +76,7 @@ opt._tNo= 10;
   }
   
  jtrics()
+```
 
  NOTE: The function o() must be used without {} in order to catch more null values. The problem is the fails will not 
  give the description of failed variables or objects.E.g. o()
