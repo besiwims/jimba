@@ -43,21 +43,35 @@ opt._F = 0; // _F switch is to turn on (1) or off(0) functions profilling functi
 
  import {opt,jtest,jtrics,o,tS,tE,gAlphaNumericSymbolsString,gBoolean,gLowerCaseAlphabetString,
   gNo,gNull,gOnlyDigitsString,gUpperCaseAlphabetString } from 'jimba';
+  
 opt._O = 1;
+
 opt._FailsOnly = 0;
+
 opt._T = 1;
+
 opt._M = 0;
+
 opt._R = 1;
+
 opt._F = 1;
+
 opt._tNo= 10;
 
  for (let i = 0; i < opt._tNo; i++) {
+ 
    const num: number = gNo();
+   
    const n: any= gNull(); o(n); //testing gNull which generates all types of nulls
+   
    const gAlphaNumericSymbolsString_: any= gAlphaNumericSymbolsString(); o(gAlphaNumericSymbolsString_); //
+   
    const gBoolean_: any= gBoolean(); o({gBoolean_}); //
+   
    const gLowerCaseAlphabetString_: any= gLowerCaseAlphabetString(); o({gLowerCaseAlphabetString_}); //
+   
    const gOnlyDigitsString_: any= gOnlyDigitsString(); o({gOnlyDigitsString_}); //
+   
    const gUpperCaseAlphabetString_: any= gUpperCaseAlphabetString(); o({gUpperCaseAlphabetString_}); //
   }
   
