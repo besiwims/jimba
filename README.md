@@ -1,4 +1,4 @@
-0. Version 1.1.3
+0. Version 1.1.5
 1. Library: Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library
 2. Author: Bernard Sibanda [Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd]
 3. License: MIT
@@ -14,27 +14,56 @@ import {opt,jtest,jtrics,o,tS,tE } from 'jimba'; //use this at the top page
 opt._O = 0; // console.log the variable, array, or object using function o() as follows: 
 
             // const varDemo = "jimba demo"; o({varDemo})
-            
+
             // Please note the the o() parameter takes object so always add the {} around your variable
-            
+
             // this will help tell you the name of item being logged
-            
+
 opt._FailsOnly = 0; // Change this to 1 to only see errors and failing tests
 
 opt._T = 0; // Change this to 1 to only see tests created using the jtest() function
 
             // jtest demo: const x = (y,c)=>{ return y * c}; jtest("demo",demo(2,3),6)
-            
+
             // Firs parameter is description of test
-            
+
             // Second parameter is the function call with its arguments
-            
+
             // Third parameter of jtest is the expected answer
-            
+
 opt._M = 0; // _M is a switch to turn on/off console log call stack. Use 0 for false and 1 for true
 
 opt._R = 0; // _R switch is turned on by 1 to run everything: logs, tests and function profilings and 0 to turn it off
 
 opt._F = 0; // _F switch is to turn on (1) or off(0) functions profilling function matrics
 
- 
+ github link https://github.com/besiwims/jimba/tree/main
+
+ Added abitrary value generators to improve testing numbers, strings and booleans 07-05-2024
+
+ import {opt,jtest,jtrics,o,tS,tE,gAlphaNumericSymbolsString,gBoolean,gLowerCaseAlphabetString,
+  gNo,gNull,gOnlyDigitsString,gUpperCaseAlphabetString } from 'jimba';
+opt._O = 1;
+opt._FailsOnly = 0;
+opt._T = 1;
+opt._M = 0;
+opt._R = 1;
+opt._F = 1;
+opt._tNo= 10;
+
+ for (let i = 0; i < opt._tNo; i++) {
+   const num: number = gNo();
+   const n: any= gNull(); o(n); //testing gNull which generates all types of nulls
+   const gAlphaNumericSymbolsString_: any= gAlphaNumericSymbolsString(); o(gAlphaNumericSymbolsString_); //
+   const gBoolean_: any= gBoolean(); o({gBoolean_}); //
+   const gLowerCaseAlphabetString_: any= gLowerCaseAlphabetString(); o({gLowerCaseAlphabetString_}); //
+   const gOnlyDigitsString_: any= gOnlyDigitsString(); o({gOnlyDigitsString_}); //
+   const gUpperCaseAlphabetString_: any= gUpperCaseAlphabetString(); o({gUpperCaseAlphabetString_}); //
+  }
+  
+ jtrics()
+
+ NOTE: The function o() must be used without {} in order to catch more null values. The problem is the fails will not 
+ give the description of failed variables or objects.E.g. o()
+ This means that if one needs to see descriptions then the user must use the {} e.g. o({})
+ Best rule is always try both and o() catches more errors especially with nexted objects whose first elements are null.
