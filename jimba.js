@@ -67,6 +67,8 @@ tS("hi");
 // block of code being measured for speed
 tE("hi");
 ```
+This will produces the time hi ---ms. All functions marked with tS() and tE() will also show how many times they are being called.
+
 When testing a developer needs random value generators. They are sometimes called arbitrary value generators. Jimba comes with functions that does these.
 Jimba brings these functions as members of an object called gRValue.
 ```
@@ -92,8 +94,6 @@ examples of using the above are :
 17. const digts = gRValue.digts(9); jj("Home","Number iwith 9 digits",digts,"string()")
 18. const symbls = gRValue.symbls(70); jj("Home","70 chars",symbls,"string()")
 ```
-This will produces the time hi ---ms. All functions marked with tS() and tE() will also show how many times they are being called.
-
 Thorough testing of jimba is still going on and anyone is invited to try it and give feedback. Installing as npm i jimba will install the 
 latest version. Should one face errors of dependence issues then one needs to install it like this npm i jimba --force
 
