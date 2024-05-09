@@ -71,6 +71,35 @@ tS("hi");
 // block of code being measured for speed
 tE("hi");
 ```
+```
+    The random values generators are :
+   
+    gNo:(min=opt._Min, max=opt._Max)
+    gBool:(len=1)
+    gNull:(n=1)
+    chrs:(len=10)
+    upperC:(length=10)
+    lowerC:(length=10)
+    digts:(length=10)
+    symbls:(len=10)
+
+    examples:
+
+    const num = gRValue.gNo(gRValue.gNo(),gRValue.gNo()); jj("Home","Number is between -10 and 10",num,"between(-3,4)","positive no")
+    const gBool = gRValue.gBool(gRValue.gNo()); jj("Home","create 10 bools ",gBool.length,"eq(10)","10")   
+    const gNull = gRValue.gNull(gRValue.gNo()); jj("Home","create no less or equal to 1",gNull.length,"leq(1)")
+    const gt = gRValue.gNo(); jj("Home","create number greater than 10",gt,"gt(10)","no > 10")
+    const lt = gRValue.gNull(); jj("Home","create number less than 1",lt.length,"lt(0)","lt length")  
+    const chrs = gRValue.chrs(90); jtest("chrs",chrs,'kmjnh')
+    const upperC_ = gRValue.upperC(60); jtest("chrs",upperC_,'kmjnh')
+    const lowerC = gRValue.lowerC(6); jtest("chrs",lowerC,'kmjnh');jj("Home","lowerC",lowerC,"eq('abcd')")
+    const digts = gRValue.digts(9); jj("Home","Number iwith 9 digits",digts,"string()")
+    const symbls = gRValue.symbls(70); jj("Home","70 chars",symbls,"string()")
+```
+    This will produces the time hi ---ms. All functions marked with tS() and tE() will also show how many times they are being called.
+
+    Thorough testing of jimba is still going on and anyone is invited to try it and give feedback. Installing as npm i jimba will install the 
+    latest version. Should one face errors of dependence issues then one needs to install it like this npm i jimba --force
 
 ### 9. Feedback and Contact
 For feedback or inquiries about this library, please contact:
