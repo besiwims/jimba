@@ -68,15 +68,16 @@ tS("hi");
 tE("hi");
 ```
 When testing a developer needs random value generators. They are sometimes called arbitrary value generators. Jimba comes with functions that does these.
+Jimba brings these functions as members of an object called gRValue.
 ```
-1. gNo:(min=opt._Min, max=opt._Max)
-2. gBool:(len=1)
-3. gNull:(n=1)
-4. chrs:(len=10)
-5. upperC:(length=10)
-6. lowerC:(length=10)
-7. digts:(length=10)
-8. symbls:(len=10)
+1. gRValue.gNo:(min=opt._Min, max=opt._Max)
+2. gRValue.gBool:(len=1)
+3. gRValue.gNull:(n=1)
+4. gRValue.chrs:(len=10)
+5. gRValue.upperC:(length=10)
+6. gRValue.lowerC:(length=10)
+7. gRValue.digts:(length=10)
+8. gRValue.symbls:(len=10)
 ```
 examples of using the above are :
 ```
