@@ -1,4 +1,4 @@
-**Table of Contents**
+*Table of Contents**
 1. [Library Overview](#library-overview)
 2. [Author Information](#author-information)
 3. [License](#license)
@@ -9,7 +9,7 @@
 8. [Function Speed Measurement](#function-speed-measurement)
 9. [Feedback and Contact](#feedback-and-contact)
 ---
-### 0. Version 1.2.0
+### 0. Version 1.2.1
 
 ### 1. Library Overview
 Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library. Its purpose is to introduce testing from simple console logs all the way to unit testing with bigger frameworks.
@@ -69,7 +69,9 @@ tE("hi");
 ```
 This will produces the time hi ---ms. All functions marked with tS() and tE() will also show how many times they are being called.
 
-When testing a developer needs random value generators. They are sometimes called arbitrary value generators. Jimba comes with functions that does these. Jimba brings these functions as members of an object called gRValue.
+When testing a developer needs random value generators. They are sometimes called arbitrary value generators. 
+Jimba comes with functions that does these. Jimba brings these functions as members of an object called gRValue.
+Below is a list of arbitrary value generators and their default parameters
 ```
 1. gRValue.gNo:(min=opt._Min, max=opt._Max)
 2. gRValue.gBool:(len=1)
@@ -80,7 +82,8 @@ When testing a developer needs random value generators. They are sometimes calle
 7. gRValue.digts:(length=10)
 8. gRValue.symbls:(len=10)
 ```
-examples of using the above are :
+examples of using the above are : also see how to add 4th parameter to jj() functions e.g. jj("Home","Testing ",gBool.length,"eq(10)","10"), i.e. eq(10)
+, "between(-3,4)", "gt(10)", "lt(0)","string()", other methods are listed under ###7 match makers.
 ```
 9. const num = gRValue.gNo(gRValue.gNo(),gRValue.gNo()); jj("Home","Number is between -10 and 10",num,"between(-3,4)","positive no")
 10. const gBool = gRValue.gBool(gRValue.gNo()); jj("Home","create 10 bools ",gBool.length,"eq(10)","10")   
@@ -99,3 +102,92 @@ Thorough testing of jimba is still going on and anyone is invited to try it and 
 For feedback or inquiries about this library, please contact:
 - cto@wims.io
 - besi@tobb.co.za
+
+### 10 Improvements. The jtest, jj and o(), tS(), tE() functions have been improved and bungled as one object j{tS(),tE(),log(),test(),check()}. 
+This makes using the logs, tests and checks very easy because you have to just call j on the vscode and the 3 methods will show.
+This now only requires one to call 2 objects and 2 functions and then do miracle testing, checking and logging
+
+import {opt,jtrics,gRValue,j} from 'jimba';
+
+  opt._R = 0;           //run all
+
+  opt._O = 1;           //run o() function calls
+  opt._M = 0;           //show stack frames for objects
+
+  opt._F = 0;           //run functions
+
+  opt._T = 1;           //jtest, jj, jescribe i.e. tests
+  opt._FailsOnly = 0;   //run only failing tests
+  opt._Ob = 0;          //show stack frames
+
+  Examples :
+   j.s("hi");
+   const add =(x : any,y:any)=>{
+    return x + y
+  }
+  const ans = add(9,9);
+  j.log(ans);
+  j.test("Home","add 9 & 9 = 18",ans)?.eq(18)
+  const ans1 = add(9,80);
+  j.test("Home","add 9 & 80 > 18",ans1)?.geq(18)
+  const ans2 = add(2,8);
+   j.test("Home","add 2 8  <= 18",ans2)?.leq(18)
+  const ans3 = add(9,8);
+  j.test("Home","add 9 & 8 > 10",ans3)?.gt(10)
+   const ans4 = add(9,2);
+  j.test("Home","add 9 & 2 < 18",ans4)?.lt(18)
+  const ans5 = null;
+  j.test("Home","ans5 is null",ans5)?.null()
+  const ans6 = {object:""};  
+  j.test("Home","ans6 is object",ans6)?.object()
+  const ans7 : [] = [];
+  j.test("Home","ans7 is array",ans7)?.array()
+  const ans8 = add(-10,8);
+  j.test("Home","add -10 plus 8 = negative",ans8)?.neg()
+  const ans9 = add(9,8);
+  j.test("Home","add 9 & 8 > 18",ans9)?.pos()
+  const ans10 = add(9,8);
+  j.test("Home","add 9 & 8 > 18",ans10)?.num()
+  const ans11 = false;
+  j.test("Home","false is bool",ans11)?.bool()
+  const ans12 = "james";
+  j.test("Home","add 9 & 8 > 18",ans12)?.string()
+  const ans13 = add(-12,76);
+  j.test("Home","add 9 & 8 > 18",ans13)?.notNull()
+  const name = "james"; j.log({name})
+  const tmpe = 0; j.log(tmpe)
+
+  function concateNames(name1:string,name2:string) {
+    return name1+name2;
+  }
+
+  function cNulls (){
+    return gRValue.gNull(10)
+  } 
+  
+  for (let i = 0; i < opt._tNo; i++) {
+    const os = gRValue.gNo()+gRValue.gNo();                         j.log(os)
+    const answ = add(gRValue.gNo(),gRValue.gNo());                  j.test("Home","add()",answ)?.gt(40)
+    const arrValues = cNulls() ;                                    j.test("Home","cNulls",cNulls())?.array();
+    const names = concateNames(gRValue.chrs(10),gRValue.digts(5));  j.check("concateNames",names.length,15);j.test("Home","concateNames",names.length)?.eq(15)
+  }
+   
+ jtrics()
+
+ Outputs
+
+ 115 : jTESTING Home :>: cNulls
+
+j.js:952 ✓ PASS : ,,,0,[object Object],[object Object],0,0,[object Object],[object Object] :>>: array
+
+j.js:1232 117 :  : jtest TESTING concateNames
+
+j.js:1267 ✓ PASS : 15
+
+j.js:1195 118 : jTESTING Home :>: concateNames
+
+j.js:952 ✓ PASS : 15 :>>: 15
+
+j.js:1171 X FAIL 
+
+
