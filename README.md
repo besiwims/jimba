@@ -105,13 +105,14 @@ For feedback or inquiries about this library, please contact:
 
 ### 10 Improvements. 
 ```
-The jtest, jj and o(), tS(), tE() functions have been improved and bungled as one object j{tS(),tE(),log(),test(),check()}.
+The jtest, jj() and o(), tS(), tE() functions have been improved and bungled as one object j{s(),e(),log(),test(),check()}.
 ```
-This makes using the logs, tests and checks very easy because you have to just call j on the vscode and the 3 methods will show.
-This now only requires one to call 2 objects and 2 functions and then do miracle testing, checking and logging
+This makes using the logs, tests and checks very easy because you have to just call j on the vscode and the methods will show.
+This now only requires a developer to call 3 objects : opt,gRValues and j, and 1 functions namely jtrics() for results.
+Carefully check the tests samples  below including the simplified switches.
 ```
 import {opt,jtrics,gRValue,j} from 'jimba';
-
+ //switches
   opt._R = 0;           //run all
 
   opt._O = 1;           //run o() function calls
