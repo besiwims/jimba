@@ -44,6 +44,10 @@ What problems does it solve?
 8. Helps also introduces testing using other libraries Mocha, Jest, Vite but is better because it is very much simplified.
 9. Begins property based testing in a very simple way...
 10. Very easy to install : add a script tag on a website/webapp on simple run `npm i jimba` or `npm i jimba --force`
+11. A developer who needs his/her code to run fast needs to switch jimba off using the opt... switches at every page.
+12. One can also selectively test code sections using j.s() and j.e() funcitons for starting and end function profiling
+13. Jimba allows not only object console logging but one can toggle tracing off and on. Also one can toggle testing sections of code on and off
+14. Above all it combines 3 traditonal testing functions describe(), expect() and it() into one j.test()
 
 Below are examples of the jimba version 1.2.1
 ```
