@@ -103,10 +103,13 @@ For feedback or inquiries about this library, please contact:
 - cto@wims.io
 - besi@tobb.co.za
 
-### 10 Improvements. The jtest, jj and o(), tS(), tE() functions have been improved and bungled as one object j{tS(),tE(),log(),test(),check()}. 
+### 10 Improvements. 
+```
+The jtest, jj and o(), tS(), tE() functions have been improved and bungled as one object j{tS(),tE(),log(),test(),check()}.
+```
 This makes using the logs, tests and checks very easy because you have to just call j on the vscode and the 3 methods will show.
 This now only requires one to call 2 objects and 2 functions and then do miracle testing, checking and logging
-
+```
 import {opt,jtrics,gRValue,j} from 'jimba';
 
   opt._R = 0;           //run all
@@ -165,10 +168,10 @@ import {opt,jtrics,gRValue,j} from 'jimba';
     return gRValue.gNull(10)
   } 
   
-  for (let i = 0; i < opt._tNo; i++) {
-    const os = gRValue.gNo()+gRValue.gNo();                         j.log(os)
-    const answ = add(gRValue.gNo(),gRValue.gNo());                  j.test("Home","add()",answ)?.gt(40)
-    const arrValues = cNulls() ;                                    j.test("Home","cNulls",cNulls())?.array();
+  for (let i = 0; i < opt._tNo; i++) {  
+    const os = gRValue.gNo()+gRValue.gNo();                         j.log(os)    
+    const answ = add(gRValue.gNo(),gRValue.gNo());                  j.test("Home","add()",answ)?.gt(40)    
+    const arrValues = cNulls() ;                                    j.test("Home","cNulls",cNulls())?.array();    
     const names = concateNames(gRValue.chrs(10),gRValue.digts(5));  j.check("concateNames",names.length,15);j.test("Home","concateNames",names.length)?.eq(15)
   }
    
@@ -176,18 +179,12 @@ import {opt,jtrics,gRValue,j} from 'jimba';
 
  Outputs
 
- 115 : jTESTING Home :>: cNulls
-
+j.js:115 : jTESTING Home :>: cNulls
 j.js:952 ✓ PASS : ,,,0,[object Object],[object Object],0,0,[object Object],[object Object] :>>: array
-
 j.js:1232 117 :  : jtest TESTING concateNames
-
 j.js:1267 ✓ PASS : 15
-
 j.js:1195 118 : jTESTING Home :>: concateNames
-
 j.js:952 ✓ PASS : 15 :>>: 15
-
 j.js:1171 X FAIL 
 
 
