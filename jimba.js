@@ -1,7 +1,5 @@
-
-
 /*
-Version : 1.2.2
+Version : 1.2.3
 Jimba is a javascript/typescript testing, profiling, logging, tracing library  
 Author:         Bernard Sibanda (Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd)
 License :       MIT License
@@ -398,9 +396,9 @@ export const j={
         {
             opt._FUNCTIONS.push(label);
     
-            console.log("%cFunc starts : "+opt._FUNCTIONS,"background-color:#fff;color:purple;")
+            console.log("%cFunc ends : "+opt._FUNCTIONS,"background-color:#fff;color:purple;")
     
-            console.time("TIME : "+label);       
+            console.timeEnd("TIME : "+label);       
         }
     }
 }
