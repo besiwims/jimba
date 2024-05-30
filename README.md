@@ -9,7 +9,7 @@
 8. [Function Speed Measurement](#function-speed-measurement)
 9. [Feedback and Contact](#feedback-and-contact)
 ---
-### 0. Version 1.2.2
+### 0. Version 1.2.3
 
 ### 1. Library Overview
 Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library. Its purpose is to introduce testing from simple console logs all the way to unit testing with bigger frameworks.
