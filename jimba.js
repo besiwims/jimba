@@ -1,5 +1,5 @@
 /*
-Version : 1.2.3
+Version : 1.2.4
 Jimba is a javascript/typescript testing, profiling, logging, tracing library  
 Author:         Bernard Sibanda (Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd)
 License :       MIT License
@@ -21,7 +21,85 @@ What problems does it solve?
 13. Jimba allows not only object console logging but one can toggle tracing off and on. Also one can toggle testing sections of code on and off
 14. Above all it combines 3 traditonal testing functions describe(), expect() and it() into one j.test()
 
+import {opt,j } from './jimba';
+opt._R = 0; //run all
+opt._FailsOnly = 0; //run only failors
+opt._T = 1; // run all tests
+opt._O = 0; //run j log objects tracing
+opt._Ob = 0; //show objects of ComparisonMethods
+opt._F = 0; // run functions only
+opt._tNo = 2000; // standard number for iterations on gRvalues which is an object of arbitraries generators
+opt._Min = -100; //used by gRvalues for lowest value
+opt._Max = 100; //used by gRvalues for max value
+opt._FUNCTIONS = []; //collects all profiled functions
+
+Examples:
+const test = undefined; j.log({test});j.test("INDEX","test",test)?.contains("null")
+
+const name = "joe"; j.test("TEST","name",name)?.eq("joe")
+
+const computeMult = ((x:number,y:number)=>{
+  return x * y
+})
+const computeAdd = ((x:number,y:number)=>{
+  return x + y
+})
+const computeDiv = ((x:number,y:number)=>{
+  return x / y
+})
+const computeSub = ((x:number,y:number)=>{
+  return x - y
+})
+
+//This is a pack of above functions with their unit test and random values from j.gNo
+const testPack = (()=>{
+  //1
+  const firstNumber1 = j.gNo(-10000,10000),secNumber1 = j.gNo(-10000,10000)
+  const ansMulti = computeMult(firstNumber1,secNumber1); j.check("ansMulti",ansMulti,200)
+  //2
+  const firstNumber2 = j.gNo(-10000,10000),secNumber2 = j.gNo(-10000,10000)
+  const ansAdd = computeAdd(firstNumber2,secNumber2); j.test("before Home","ansAdd",ansAdd)?.neg() 
+  //3
+  const firstNumber3 = j.gNo(-10000,10000),secNumber3 = j.gNo(-10000,10000)
+  const ansDiv = computeDiv(firstNumber3,secNumber3); j.test("before Home","ansDiv",ansDiv)?.num() 
+  //4
+  const firstNumber4 = j.gNo(-10000,10000),secNumber4 = j.gNo(-10000,10000)
+  const ansSub = computeSub(firstNumber4,secNumber4); j.test("before Home","ansSub",ansSub)?.range(100,1000) 
+  //5
+  const complexCall = computeMult(computeAdd(firstNumber4,secNumber2),computeDiv(secNumber3,firstNumber1));j.test("before Home","complexCall",complexCall)?.neg() 
+})
+
+//j.trics(null) use it with null if there is no testPack
+j.trics(testPack); //loops opt._tNo(see const above) times calling each unit test in the testPack  
+
+/* output results 
+
+17991 :  : jcheck ansMulti
+j.js:242 X FAIL : Am expecting 200 but got 80696274
+j.js:167 17992 : jTESTING before Home :>: ansAdd
+j.js:737 ✓ PASS : -2161 :>>: negative
+j.js:167 17994 : jTESTING before Home :>: ansDiv
+j.js:737 ✓ PASS : -7.4268585131894485 :>>: num
+j.js:167 17996 : jTESTING before Home :>: ansSub
+j.js:737 ✓ PASS : -3627 :>>: range pass
+j.js:167 17998 : jTESTING before Home :>: complexCall
+j.js:748 X FAIL : 1325.2892981899017 :>>: negative
+j.js:204 18000 :  : jcheck ansMulti
+j.js:242 X FAIL : Am expecting 200 but got -13546625
+j.js:167 18001 : jTESTING before Home :>: ansAdd
+j.js:748 X FAIL : 6192 :>>: negative
+j.js:167 18003 : jTESTING before Home :>: ansDiv
+j.js:737 ✓ PASS : -0.5619785458879618 :>>: num
+j.js:167 18005 : jTESTING before Home :>: ansSub
+j.js:748 X FAIL : 2038 :>>: range fail
+j.js:167 18007 : jTESTING before Home :>: complexCall
+j.js:748 X FAIL : 2994.9406896551723 :>>: negative
+j.js:427 TOTAL_PASSES : 5092
+j.js:417 TOTAL_ERRORS : 4912
+
 */
+
+
 export const opt = {
     TOTAL_FAIL : 0, 
     TOTAL_PASS : 0, 
@@ -32,75 +110,15 @@ export const opt = {
     _R : 0, //run all
     _M : 0, // trace frames for o() functions
     _FailsOnly :0, //run only failors
-    _T : 0, // run tests
-    _O : 0, //run objects
+    _T : 0, // run all tests
+    _O : 0, //run j log objects tracing
     _Ob : 0, //show objects of ComparisonMethods
     _F : 0, // run functions only
     _Tc : 1, // count tests only
     _tNo : 20, // standard number for iterations on gRvalues which is an object of arbitraries generators
-    _Min : -100, //used by gNo for lowest value
-    _Max : 100, //used by gNo for max value
+    _Min : -100, //used by gRvalues for lowest value
+    _Max : 100, //used by gRvalues for max value
     _FUNCTIONS : [], //collects all profiled functions
-}
-
-export const gRValue = {
-    gNo:(min=opt._Min, max=opt._Max)=>{
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    },
-    gDec:()=>{
-        return Math.random()
-    },
-    gANo:(min=opt._Min, max=opt._Max)=>{
-        min = min;
-        max = max;
-        return (Math.random() * (max - min + 1)) + min;
-    },
-    gBool:(n=1)=>{
-        n = n > 0? n : opt._tNo;
-        const arrBool = [];
-        for (let i = 0; i < n; i++) {
-            arrBool.push(Math.random() < 0.5)        
-        }    
-        return arrBool;
-    },
-    gNull:(n=1)=>{
-        n = n > 0? n : opt._tNo;
-        const negativeNo = gRValue.gNo(-1000,-1);
-        const nulls = [{empty:null},{empty:undefined},{empty:"null"},{empty:"undefined"},,null, undefined,0,'',"",{empty:[0]},{empty:""},
-        {empty:''},{empty:"0"},{empty:0},{empty:[]},{empty:{}},[0],[],[''],[""],{},negativeNo];
-        const nullArray = [];
-        for (let i = 0; i < n; i++) {
-            nullArray.push(nulls[Math.floor(Math.random()*nulls.length)]);        
-        }
-        return nullArray;
-    },
-    chrs:(len=10)=>{
-        let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_?|[]{}:",.!@#$%^&*()+~`';
-        return charProcess(characters,len);
-    },
-    upperC:(length=10)=>{
-        let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        return charProcess(characters,length)
-    },
-    lowerC:(length=10)=>{
-        let result = '';
-        const characters = 'abcdefghijklmnopqrstuvwxyz';
-        return charProcess(characters,length)
-    },
-    digts:(length=10)=>{
-        let result = '';
-        const characters = '0123456789';
-        return charProcess(characters,length)
-    },
-    symbls:(len=10)=>{
-        let result = '';
-        const characters = `'-_?|[]{}:",.!@#$%^&*()+~\\><=`;
-        return charProcess(characters,len);
-    },
 }
 
 export const j={
@@ -209,6 +227,10 @@ export const j={
                 }
                 
             }
+            else
+            {
+                //
+            }
     },
     test:(title,fTitle,actual,k=0)=>
     {
@@ -216,12 +238,26 @@ export const j={
         { 
             if(opt._T === 1|| opt._R===1 || !(k === 0))
             {       
-                const trackcalls = (opt._Tc++)+" : ";   
+                const trackcalls = (opt._Tc++)+" : "; 
+                
+                 if(opt._FailsOnly === 1)
+                 {
+                     //
+                 }
+                 else
+                 {
+                     console.log("%c"+trackcalls+"jTESTING "+title+" :>: "+fTitle,"background-color:#fff;color:purple;");
+                 }
 
-                console.log("%c"+trackcalls+"jTESTING "+title+" :>: "+fTitle,"background-color:#fff;color:purple;");
+                
 
                 return new ComparisonMethods(actual);
             }
+            else
+            {
+                 return new ComparisonMethods(actual);
+            }
+
         }
         catch(error)
         {
@@ -231,13 +267,12 @@ export const j={
     },
     check:(title,varString,expectedAnswer,k=0)=>{
         const trackcalls = (opt._Tc++)+" : "; 
-        const tBallConsole = "%c"+trackcalls+" : jtest TESTING " + title;
+        const tBallConsole = "%c"+trackcalls+" : jcheck " + title;
         const cssBlue = "background-color:#fff;color:blue;";
         if(!title || !varString || !expectedAnswer)
         {
             if(opt._T == 1)
-            {
-                
+            {                
                 console.log(tBallConsole,cssBlue);
                 opt.TOTAL_TESTS_FAIL++;
                 const res = varString?varString:" nothing.";    
@@ -255,9 +290,14 @@ export const j={
         {
             typeof varString === 'string';
     
-            console.log(tBallConsole,cssBlue);
-    
-            let results = "";
+            if(opt._FailsOnly === 1)
+            {
+               // 
+            }
+            else
+            {
+              console.log(tBallConsole,cssBlue);   
+            }
     
             if(varString === undefined || varString == null)
             {
@@ -267,9 +307,8 @@ export const j={
             }
             else if(typeof varString === 'string' && typeof expectedAnswer === 'string')
             {
-                results = varString.localeCompare(expectedAnswer);
     
-                if(results === 0)
+                if((varString.localeCompare(expectedAnswer)) === 0)
                 {
                     if(opt._FailsOnly === 0)
                     {
@@ -284,9 +323,8 @@ export const j={
             }
             else if(typeof varString === 'number' && typeof expectedAnswer === 'number')
             {
-                results = varString === expectedAnswer;
-    
-                if(results === true)
+                    
+                if((varString === expectedAnswer) === true)
                 {
                     if(opt._FailsOnly === 0)
                     {
@@ -306,9 +344,8 @@ export const j={
             }
             else if(typeof varString === 'boolean' && typeof expectedAnswer === 'boolean')
             {
-                results = varString === expectedAnswer;
-    
-                if(results === true)
+     
+                if((varString === expectedAnswer) === true)
                 {
                     if(opt._FailsOnly === 0)
                     {
@@ -324,9 +361,8 @@ export const j={
             }
             else if(Array.isArray(varString) && Array.isArray(expectedAnswer))
             {
-                results = compareArrays(varString, expectedAnswer);
-    
-                if(results === true)
+   
+                if((compareArrays(varString, expectedAnswer)) === true)
                 {
                     if(opt._FailsOnly === 0)
                     {
@@ -342,20 +378,22 @@ export const j={
             }
             else if(typeof varString === 'object' && typeof expectedAnswer === 'object')
             {
-                results = compareObjects(varString,expectedAnswer);
-    
-                if(results === true)
-                {
-                    if(opt._FailsOnly === 0)
-                    {
-                        console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
-                    }
-                }
-                else
-                {   
-                    opt.TOTAL_TESTS_FAIL++;
-                    const res = varString?varString:" nothing.";
-                    console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+                if(opt._T === 1)
+                {       
+        
+                        if((compareObjects(varString,expectedAnswer)) === true)
+                        {
+                            if(opt._FailsOnly === 0)
+                            {
+                                console.log("%c✓ PASS : " + varString,"background-color:#fff;color:green;");opt.TOTAL_PASS++;opt.TOTAL_TESTS_PASS++;
+                            }
+                        }
+                        else
+                        {   
+                            opt.TOTAL_TESTS_FAIL++;
+                            const res = varString?varString:" nothing.";
+                            console.log("%cX FAIL : Am expecting " + expectedAnswer + " but got " + res,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;
+                        }
                 }
             }    
             else
@@ -364,6 +402,7 @@ export const j={
                 console.log(expectedAnswer);
                 console.log("%c WRONG DATA TYPES GIVEN! First param is of : " + typeof varString + ", Second param is of : " + typeof expectedAnswer,"background-color:#fff;color:red;");
             }
+            
             
         }
         else
@@ -400,6 +439,78 @@ export const j={
     
             console.timeEnd("TIME : "+label);       
         }
+    },
+    rTP:(fn,n=opt._tNo)=>{
+        for (let i = 0; i < n; i++) { 
+            fn()
+        }        
+    },
+    trics:(fn,n=opt._tNo,k=0)=>{        
+        if(fn != null && (typeof fn === 'function') )
+        {
+            for (let i = 0; i < n; i++) { 
+                fn()
+            } 
+        } 
+
+        passes(k),fails(k);funcs(k);tests(k);
+    },
+    hexR : () => {
+      let n = (Math.random() * 0xfffff * 1000000).toString(16);
+      return n;
+    }
+    ,
+    gNo:(min=opt._Min, max=opt._Max)=>{
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+    gDec:()=>{
+        return Math.random()
+    },
+    gANo:(min=opt._Min, max=opt._Max)=>{
+        min = min;
+        max = max;
+        return (Math.random() * (max - min + 1)) + min;
+    },
+    gBool:(n=1)=>{
+        n = n > 0? n : opt._tNo;
+        const arrBool = [];
+        for (let i = 0; i < n; i++) {
+            arrBool.push(Math.random() < 0.5)        
+        }    
+        return arrBool;
+    },
+    gNull:(n=1)=>{
+        n = n > 0? n : opt._tNo;
+        const negativeNo = gRValue.gNo(-1000,-1);
+        const nulls = [{empty:null},{empty:undefined},{empty:"null"},{empty:"undefined"},,null, undefined,0,'',"",{empty:[0]},{empty:""},
+        {empty:''},{empty:"0"},{empty:0},{empty:[]},{empty:{}},[0],[],[''],[""],{},negativeNo];
+        const nullArray = [];
+        for (let i = 0; i < n; i++) {
+            nullArray.push(nulls[Math.floor(Math.random()*nulls.length)]);        
+        }
+        return nullArray;
+    },
+    chrs:(len=10)=>{        
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_?|[]{}:",.!@#$%^&*()+~`';
+        return charProcess(characters,len);
+    },
+    upperC:(length=10)=>{        
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        return charProcess(characters,length)
+    },
+    lowerC:(length=10)=>{        
+        const characters = 'abcdefghijklmnopqrstuvwxyz';
+        return charProcess(characters,length)
+    },
+    digts:(length=10)=>{        
+        const characters = '0123456789';
+        return charProcess(characters,length)
+    },
+    symbls:(len=10)=>{        
+        const characters = `'-_?|[]{}:",.!@#$%^&*()+~\\><=`;
+        return charProcess(characters,len);
     }
 }
 
@@ -457,10 +568,6 @@ function tests(k=0){
         console.log("%cTOTAL_WRONG_DATA_TYPES_PARAMS : " + opt.TOTAL_WRONG_DATA_TYPES_PARAMS,"background-color:blue;color:#fff;"); 
     }
 
-}
-
-export function jtrics(k=0){
-    passes(k),fails(k);funcs(k);tests(k);
 }
 
 const compareArrays = (a, b) => {    
@@ -579,6 +686,36 @@ class ComparisonMethods {
             fail(this.actual,expected,k); 
         }
     }
+    contains(expected,k=0)
+    { 
+        if(this.actual)
+        {
+            console.log(this.actual);
+            console.log(expected);
+                if (this.actual.toString().includes(expected)) 
+                {
+                    pass(this.actual,"contains "+expected,k); 
+                } 
+                else 
+                {
+                    fail(this.actual,"contains "+expected,k);           
+                }
+        }
+        else
+        {
+            const got = this.actual;
+
+            if(typeof got == "undefined")
+            {
+                fail(this.actual,"contains undefined ",k); 
+            }
+            else if(typeof got == "null")
+            {
+                fail(this.actual,"contains null ",k); 
+            }     
+        }
+        
+      }
     null(k=0)
     {
         const nulls = [{empty:null},{empty:undefined},{empty:"null"},{empty:"undefined"},,null, undefined,0,'',"",{empty:[0]},{empty:""},{empty:''},{empty:"0"},{empty:0},{empty:[]},{empty:{}},[0],[],[''],[""],{}]; 
@@ -592,6 +729,18 @@ class ComparisonMethods {
             fail(this.actual,"null",k); 
         }
       }
+      notNull(k=0)
+      {
+            const nulls = [{empty:null},{empty:undefined},{empty:"null"},{empty:"undefined"},,null, undefined,0,'',"",{empty:[0]},{empty:""},{empty:''},{empty:"0"},{empty:0},{empty:[]},{empty:{}},[0],[],[''],[""],{}]; 
+            if (!nulls.includes(this.actual)) 
+            {
+                pass(this.actual,"notNull",k); 
+            } 
+            else 
+            {
+                fail(this.actual,"notNull",k);           
+            }
+        }
     object(k=0)
     {
         if ('object' === typeof this.actual) 
@@ -647,6 +796,17 @@ class ComparisonMethods {
             fail(this.actual,"bool",k); 
         }
       }
+    notBool(k=0)
+    {
+        if (typeof this.actual !=  'boolean') 
+        {
+            pass(this.actual,"notBool",k); 
+        } 
+        else 
+        {
+            fail(this.actual,"notBool",k); 
+        }
+      }
     num(k=0)
     {
         if (typeof this.actual === 'number') 
@@ -657,7 +817,29 @@ class ComparisonMethods {
         {
             fail(this.actual,"num",k); 
         }
-      }
+    }
+    length(n,k=0)
+    {
+        if (this.actual.length === n) 
+        {
+            pass(this.actual.length,"length",k); 
+        } 
+        else 
+        {
+            fail(this.actual.length,"length",k); 
+        }
+    }
+    range(min=0,max=100,k=0)
+      {
+          if (this.actual >= min, this.actual <= max) 
+          {
+              pass(this.actual,"range pass",k); 
+          } 
+          else 
+          {
+              fail(this.actual,"range fail",k); 
+          }
+        }
     string(k=0)
     {
         if (typeof this.actual ===  'string') 
@@ -669,19 +851,8 @@ class ComparisonMethods {
             fail(this.actual,"string",k);         
         }
       }
-      notNull(k=0)
-      {
-            const nulls = [{empty:null},{empty:undefined},{empty:"null"},{empty:"undefined"},,null, undefined,0,'',"",{empty:[0]},{empty:""},{empty:''},{empty:"0"},{empty:0},{empty:[]},{empty:{}},[0],[],[''],[""],{}]; 
-            if (!nulls.includes(this.actual)) 
-            {
-                pass(this.actual,"notNull",k); 
-            } 
-            else 
-            {
-                fail(this.actual,"notNull",k);           
-            }
-        }
-   
+     
+        
 }
 
 function pass(exp,expectedValue,k)
@@ -710,13 +881,19 @@ function fail(exp,expectedValue,k){
     }
 }
   
-const charProcess=(characters,length)=>{
-    const charactersLength = characters.length;
-    let counter = 0;
-    let result = "";
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result; 
+const charProcess=(characters="abcdefghijklmnopqrstuvwxyz",length=10)=>{
+ if(length > 0) 
+ {
+        let counter = 0;
+        let result = '';
+        while (counter < length) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+        counter += 1;
+        }
+        return result; 
+  }
+  else
+  {
+    return "";
+  }
 }
