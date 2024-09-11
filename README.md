@@ -9,7 +9,7 @@
 8. [Function Speed Measurement](#function-speed-measurement)
 9. [Feedback and Contact](#feedback-and-contact)
 ---
-### 0. Version 1.2.3
+### 0. Version 1.2.7
 
 ### 1. Library Overview
 Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library. Its purpose is to introduce testing from simple console logs all the way to unit testing with bigger frameworks.
@@ -191,6 +191,167 @@ For feedback or inquiries about this library, please contact:
 - cto@wims.io
 - besi@tobb.co.za
 
+Latest updates below
 
+Version : 1.2.7 Bernard Sibanda
+-- added the new match method named dec
+-- between(start,end,k=0)
+-- simplified switches
+Jimba is a javascript/typescript testing, profiling, logging, tracing library  
+Author:         Bernard Sibanda (Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd)
+License :       MIT License
+Installation :  npm i jimba 
+Date Started:   2021
+What problems does it solve?
+1. Trap bugs via short unit tests injected at the end of the line. E.g. const answer = add(2,4); j.test("Home", " Adding 2 and 4 must give 6",answer)
+2. No need to remove the j tests like we do remove the console log because it guards against changes in tested code snippets or variables
+3. Most developers are not testing because it is triple work, time consuming and expensive. Jimba.js solves this by adding tests snippets at every variable and function calls without bloating the code.
+4. Jimba js is a Swiss knife: It is not only improved console.log, it is not just tracing code execution to track computation but comprehensive unit testing for javascript
+5. Most simple tests or console logs use simple samples to test but Jimba copies quick test method of using arbitraries values and generating these with various ranges.
+6. It has zero dependence and it is very small in size and has very few things to use
+7. It speeds up javascript testing.
+8. Helps also introduces testing using other libraries Mocha, Jest, Vite but is better because it is very much simplified.
+9. Begins property based testing in a very simple way...
+10. Very easy to install : add a script tag on a website/webapp on simple run `npm i jimba` or `npm i jimba --force`
+11. A developer who needs his/her code to run fast needs to switch jimba off using the opt... switches at every page.
+12. One can also selectively test code sections using j.s() and j.e() funcitons for starting and end function profiling
+13. Jimba allows not only object console logging but one can toggle tracing off and on. Also one can toggle testing sections of code on and off
+14. Above all it combines 3 traditonal testing functions describe(), expect() and it() into one j.test()
+
+import {opt,j } from './jimba';
+opt._R = 0; //run all
+opt._FailsOnly = 0; //run only failors
+opt._T = 1; // run all tests
+opt._O = 0; //run j log objects tracing
+opt._Ob = 0; //show objects of ComparisonMethods
+opt._F = 0; // run functions only
+opt._tNo = 2000; // standard number for iterations on gRvalues which is an object of arbitraries generators
+opt._Min = -100; //used by gRvalues for lowest value
+opt._Max = 100; //used by gRvalues for max value
+opt._FUNCTIONS = []; //collects all profiled functions
+
+Examples:
+const test = undefined; j.log({test});j.test("INDEX","test",test)?.contains("null")
+
+const name = "joe"; j.test("TEST","name",name)?.eq("joe")
+
+const computeMult = ((x:number,y:number)=>{
+  return x * y
+})
+const computeAdd = ((x:number,y:number)=>{
+  return x + y
+})
+const computeDiv = ((x:number,y:number)=>{
+  return x / y
+})
+const computeSub = ((x:number,y:number)=>{
+  return x - y
+})
+
+//This is a pack of above functions with their unit test and random values from j.gNo
+const testPack = (()=>{
+  //1
+  const firstNumber1 = j.gNo(-10000,10000),secNumber1 = j.gNo(-10000,10000)
+  const ansMulti = computeMult(firstNumber1,secNumber1); j.check("ansMulti",ansMulti,200)
+  //2
+  const firstNumber2 = j.gNo(-10000,10000),secNumber2 = j.gNo(-10000,10000)
+  const ansAdd = computeAdd(firstNumber2,secNumber2); j.test("before Home","ansAdd",ansAdd)?.neg() 
+  //3
+  const firstNumber3 = j.gNo(-10000,10000),secNumber3 = j.gNo(-10000,10000)
+  const ansDiv = computeDiv(firstNumber3,secNumber3); j.test("before Home","ansDiv",ansDiv)?.num() 
+  //4
+  const firstNumber4 = j.gNo(-10000,10000),secNumber4 = j.gNo(-10000,10000)
+  const ansSub = computeSub(firstNumber4,secNumber4); j.test("before Home","ansSub",ansSub)?.range(100,1000) 
+  //5
+  const complexCall = computeMult(computeAdd(firstNumber4,secNumber2),computeDiv(secNumber3,firstNumber1));j.test("before Home","complexCall",complexCall)?.neg() 
+})
+
+//j.trics(null) use it with null if there is no testPack
+j.trics(testPack); //loops opt._tNo(see const above) times calling each unit test in the testPack  
+
+/* output results 
+
+17991 :  : jcheck ansMulti
+j.js:242 X FAIL : Am expecting 200 but got 80696274
+j.js:167 17992 : jTESTING before Home :>: ansAdd
+j.js:737 ✓ PASS : -2161 :>>: negative
+j.js:167 17994 : jTESTING before Home :>: ansDiv
+j.js:737 ✓ PASS : -7.4268585131894485 :>>: num
+j.js:167 17996 : jTESTING before Home :>: ansSub
+j.js:737 ✓ PASS : -3627 :>>: range pass
+j.js:167 17998 : jTESTING before Home :>: complexCall
+j.js:748 X FAIL : 1325.2892981899017 :>>: negative
+j.js:204 18000 :  : jcheck ansMulti
+j.js:242 X FAIL : Am expecting 200 but got -13546625
+j.js:167 18001 : jTESTING before Home :>: ansAdd
+j.js:748 X FAIL : 6192 :>>: negative
+j.js:167 18003 : jTESTING before Home :>: ansDiv
+j.js:737 ✓ PASS : -0.5619785458879618 :>>: num
+j.js:167 18005 : jTESTING before Home :>: ansSub
+j.js:748 X FAIL : 2038 :>>: range fail
+j.js:167 18007 : jTESTING before Home :>: complexCall
+j.js:748 X FAIL : 2994.9406896551723 :>>: negative
+j.js:427 TOTAL_PASSES : 5092
+j.js:417 TOTAL_ERRORS : 4912
+
+
+//simplified switches
+import {opt,j } from './jimba';
+//--only turn On, More and _FailsOnly to 1 or 0
+const On = 1;
+const More = 0;
+opt._FailsOnly = 0;
+//-----------------do not change below switches
+opt._T = On;
+opt._Ob = More;
+opt._O = On;
+opt._M = More;
+//----------------------------------------------
+
+latest tests below 
+const varb = 89;
+  j.log({varb})
+
+  const g = null;
+  j.log({g})
+
+  function comput(x,y,z){
+    j.s("comput")
+    const sum = x + y + z; j.test("comput","sum = x("+x+") + y("+y+") + z("+z+")",sum)?.num()
+    const sqr = sum * sum; j.test("comput","sqr = sum("+sum+") * sum("+sum+")",sqr)?.neg(0)
+    const red = sqr - 23; j.test("comput","red = sqr("+sqr+") - 23",red)?.num()
+    const avg = red/3; j.test("comput","avg = red("+red+") / 3)",avg)?.pos()
+    const sum_ = x + y + avg;j.test("comput","sum_ = x("+x+") + y("+y+") + avg("+avg+")",sum_)?.object()
+    const sqr_ = sum_ * sum_;j.test("comput","sqr_ = sum_("+sum_+") * sum_("+sum_+")",sqr_)?.geq(1000)
+    const red_ = sqr_ - 84;j.test("comput","red_ = x("+sqr_+") - 84 ",red_)?.dec()
+    const cmp = red_/88-13*8.2;j.test("comput","cmp = x("+red_+")",cmp)?.dec()
+    j.e("comput")
+    return cmp
+  }
+
+  function complex(x,y,z=870){
+    j.s("complex")
+    const sum = x + y + z; j.test("complex","sum = x("+x+") + y("+y+") + z("+z+")",sum)?.num()
+    const sqr = sum * sum; j.test("complex","sqr = sum("+sum+") * sum("+sum+")",sqr)?.geq(0)
+    const red = sqr - 23; j.test("complex","red = sqr("+sqr+") - 23",red)?.num()
+    const avg = red/3; j.test("complex","avg = red("+red+") / 3)",avg)?.pos()
+    const sum_ = x + y + avg;j.test("complex","sum_ = x("+x+") + y("+y+") + avg("+avg+")",sum_)?.pos()
+    const sqr_ = sum_ * sum_;j.test("complex","sqr_ = sum_("+sum_+") * sum_("+sum_+")",sqr_)?.geq(1000)
+    const red_ = sqr_ - 84;j.test("complex","red_ = x("+sqr_+") - 84 ",red_)?.dec()
+    const cmp = red_/88-13*8.2;j.test("complex","cmp = x("+red_+")",cmp)?.dec()
+    j.e("complex")
+    return cmp
+  }
+
+  const testPack = ()=>{
+    const val1 = j.gANo(-100,100);
+    const val2 = j.gANo(-45,87);
+    const val3 = j.gANo(-3,800);
+
+   const avgAns = comput(val1,val2,val3); j.test("testPack","avgAns = comput(val1,val2,val3)",avgAns)?.num()
+    const avgAns2 = complex(val2,val3);  j.test("testPack","avgAns2 = comput(val1,val2,val3)",avgAns2)?.num()
+  }
+
+  j.trics(testPack)
 
 
