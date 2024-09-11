@@ -1,5 +1,5 @@
 /*
-Version : 1.2.7 Bernard Sibanda
+Version : 1.2.8 Bernard Sibanda
 -- added the new match method named dec
 -- between(start,end,k=0)
 -- simplified switches
