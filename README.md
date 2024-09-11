@@ -190,7 +190,7 @@ Thorough testing of jimba is still going on and anyone is invited to try it and 
 For feedback or inquiries about this library, please contact:
 - cto@wims.io
 - besi@tobb.co.za
-
+```
 Latest updates below
 
 Version : 1.2.7 Bernard Sibanda
@@ -354,4 +354,4 @@ const varb = 89;
 
   j.trics(testPack)
 
-
+```
