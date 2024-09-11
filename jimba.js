@@ -1,5 +1,8 @@
 /*
-Version : 1.2.4
+Version : 1.2.7 Bernard Sibanda
+-- added the new match method named dec
+-- between(start,end,k=0)
+-- simplified switches
 Jimba is a javascript/typescript testing, profiling, logging, tracing library  
 Author:         Bernard Sibanda (Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd)
 License :       MIT License
@@ -97,6 +100,65 @@ j.js:748 X FAIL : 2994.9406896551723 :>>: negative
 j.js:427 TOTAL_PASSES : 5092
 j.js:417 TOTAL_ERRORS : 4912
 
+
+//simplified switches
+import {opt,j } from './jimba';
+//--only turn On, More and _FailsOnly to 1 or 0
+const On = 1;
+const More = 0;
+opt._FailsOnly = 0;
+//-----------------do not change below switches
+opt._T = On;
+opt._Ob = More;
+opt._O = On;
+opt._M = More;
+//----------------------------------------------
+
+latest tests below 
+const varb = 89;
+  j.log({varb})
+
+  const g = null;
+  j.log({g})
+
+  function comput(x,y,z){
+    j.s("comput")
+    const sum = x + y + z; j.test("comput","sum = x("+x+") + y("+y+") + z("+z+")",sum)?.num()
+    const sqr = sum * sum; j.test("comput","sqr = sum("+sum+") * sum("+sum+")",sqr)?.neg(0)
+    const red = sqr - 23; j.test("comput","red = sqr("+sqr+") - 23",red)?.num()
+    const avg = red/3; j.test("comput","avg = red("+red+") / 3)",avg)?.pos()
+    const sum_ = x + y + avg;j.test("comput","sum_ = x("+x+") + y("+y+") + avg("+avg+")",sum_)?.object()
+    const sqr_ = sum_ * sum_;j.test("comput","sqr_ = sum_("+sum_+") * sum_("+sum_+")",sqr_)?.geq(1000)
+    const red_ = sqr_ - 84;j.test("comput","red_ = x("+sqr_+") - 84 ",red_)?.dec()
+    const cmp = red_/88-13*8.2;j.test("comput","cmp = x("+red_+")",cmp)?.dec()
+    j.e("comput")
+    return cmp
+  }
+
+  function complex(x,y,z=870){
+    j.s("complex")
+    const sum = x + y + z; j.test("complex","sum = x("+x+") + y("+y+") + z("+z+")",sum)?.num()
+    const sqr = sum * sum; j.test("complex","sqr = sum("+sum+") * sum("+sum+")",sqr)?.geq(0)
+    const red = sqr - 23; j.test("complex","red = sqr("+sqr+") - 23",red)?.num()
+    const avg = red/3; j.test("complex","avg = red("+red+") / 3)",avg)?.pos()
+    const sum_ = x + y + avg;j.test("complex","sum_ = x("+x+") + y("+y+") + avg("+avg+")",sum_)?.pos()
+    const sqr_ = sum_ * sum_;j.test("complex","sqr_ = sum_("+sum_+") * sum_("+sum_+")",sqr_)?.geq(1000)
+    const red_ = sqr_ - 84;j.test("complex","red_ = x("+sqr_+") - 84 ",red_)?.dec()
+    const cmp = red_/88-13*8.2;j.test("complex","cmp = x("+red_+")",cmp)?.dec()
+    j.e("complex")
+    return cmp
+  }
+
+  const testPack = ()=>{
+    const val1 = j.gANo(-100,100);
+    const val2 = j.gANo(-45,87);
+    const val3 = j.gANo(-3,800);
+
+   const avgAns = comput(val1,val2,val3); j.test("testPack","avgAns = comput(val1,val2,val3)",avgAns)?.num()
+    const avgAns2 = complex(val2,val3);  j.test("testPack","avgAns2 = comput(val1,val2,val3)",avgAns2)?.num()
+  }
+
+  j.trics(testPack)
 */
 
 
@@ -108,18 +170,26 @@ export const opt = {
     TOTAL_TESTS_RUN :0,
     TOTAL_WRONG_DATA_TYPES_PARAMS :0, //counts wrong parameter types mismatch given to functions
     _R : 0, //run all
-    _M : 0, // trace frames for o() functions
-    _FailsOnly :0, //run only failors
-    _T : 0, // run all tests
-    _O : 0, //run j log objects tracing
-    _Ob : 0, //show objects of ComparisonMethods
+    // _M : 0, // trace frames for o() functions
+    // _FailsOnly :0, //run only failors
+    // _T : 0, // run all tests
+    // _O : 0, //run j log objects tracing
+    // _Ob : 0, //show objects of ComparisonMethods
     _F : 0, // run functions only
-    _Tc : 1, // count tests only
-    _tNo : 20, // standard number for iterations on gRvalues which is an object of arbitraries generators
+    _Tc : 0, // count tests only
+    _tNo : 1, // standard number for iterations on gRvalues which is an object of arbitraries generators
     _Min : -100, //used by gRvalues for lowest value
     _Max : 100, //used by gRvalues for max value
-    _FUNCTIONS : [], //collects all profiled functions
+    _FUNCTIONS : [], //collects all profiled functions  
+    _T : 1,
+    _Ob : 0,
+    _O : 1,
+    _M : 0,
+    _FailsOnly : 0
+    
 }
+
+
 
 export const j={
     log:(o)=>{
@@ -144,7 +214,11 @@ export const j={
                             if(val == '' || val == 0 || val == 'null' || val == 'undefined' || val == ['']) 
                             {
                                 console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                                console.info(o);
+
+                                if(opt._M === 1)            
+                                { 
+                                    console.trace(o);
+                                }
                             }
                             else
                             {
@@ -278,8 +352,10 @@ export const j={
                 const res = varString?varString:" nothing.";    
                 console.log("%c"+title,"background-color:purple;color:white;")
                 console.log(varString);   
-                console.log(expectedAnswer);     
-                console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;        
+                console.log(expectedAnswer);  
+                
+                console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;  
+                      
                 return
             }
         }
@@ -621,7 +697,7 @@ class ComparisonMethods {
       this.expectedValue = expectedValue;
       this.k = k;
     }  
-    between(start,end)
+    between(start,end,k=0)
     {
         if(this.actual >= start && this.actual <= end)
         {
@@ -817,19 +893,21 @@ class ComparisonMethods {
         {
             fail(this.actual,"num",k); 
         }
-    }
-    length(n,k=0)
-    {
-        if (this.actual.length === n) 
-        {
-            pass(this.actual.length,"length",k); 
-        } 
-        else 
-        {
-            fail(this.actual.length,"length",k); 
+      }
+      dec(k=0)
+      {
+          const n = this.actual;
+
+          if ((n - Math.floor(n)) !== 0) 
+          {
+              pass(this.actual,"decimal",k); 
+          } 
+          else 
+          {
+              fail(this.actual,"not a decimal",k); 
+          }
         }
-    }
-    range(min=0,max=100,k=0)
+      range(min=0,max=100,k=0)
       {
           if (this.actual >= min, this.actual <= max) 
           {
@@ -873,6 +951,7 @@ function pass(exp,expectedValue,k)
 function fail(exp,expectedValue,k){
     if((opt._FailsOnly === 1) || opt._R || (k !== 0)||(opt._T == 1))
     {   const trackcalls = (opt._Tc++)+" : "; 
+        console.log("%c"+trackcalls+"jTESTING FAIL :>: expecting "+expectedValue,"background-color:#fff;color:purple;");  
         console.log("%cX FAIL : " + exp + " :>>: "+expectedValue,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;opt.TOTAL_TESTS_FAIL++;
         if(opt._Ob === 1)
         {
