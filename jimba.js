@@ -1,5 +1,5 @@
 /*
-Version : 1.2.9 - 24-12-2024
+Version : 1.2.9 24-12-2024
 Jimba is a javascript/typescript testing, profiling, logging, tracing library  
 Author:         Bernard Sibanda (Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd)
 License :       MIT License
@@ -53,66 +53,48 @@ export const opt = {
     _FUNCTIONS : [], //collects all profiled functions
 }
 export const j={
-    log:(o,stop=false)=>{
+   log:(o,stop=false)=>{
         if(!stop){
-            if(opt._O === 1 || opt._R === 1)
+        if(opt._O === 1 || opt._R === 1)
+            {
+                try 
                 {
-                    try 
+                    if(o == null || o == undefined || o == 0 || o == '')
                     {
-                        if(o == null || o == undefined || o == 0 || o == '')
+                        console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                        if(opt._M === 1)
                         {
-                            console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                            if(opt._M === 1)
-                            {
-                                console.info(o);
-                            }  
-                        }
-                        else
+                            console.info(o);
+                        }  
+                    }
+                    else
+                    {
+                        if(typeof o == 'object' && o != null)
                         {
-                            if(typeof o == 'object' && o != null)
+                            const name = Object.keys(o);  
+                            const val = Object.values(o);  
+                            if(val == '' || val == 0 || val == 'null' || val == 'undefined' || val == ['']) 
                             {
-                                const name = Object.keys(o);  
-                                const val = Object.values(o);  
-                                if(val == '' || val == 0 || val == 'null' || val == 'undefined' || val == ['']) 
-                                {
-                                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                                    console.info(o);
+                                console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+
+                                if(opt._M === 1)            
+                                { 
+                                    console.trace(o);
                                 }
-                                else
-                                {
-                                    if(opt._FailsOnly === 0)            
-                                    {                        
-                                        const nesteddValue_ = Object.values(o);
-                                        if(nesteddValue_){
-                                            const nesteddValue = Object.values(nesteddValue_);
-                                            if(typeof Object.values(nesteddValue) == Number )
-                                            {
-                                                return
-                                            }
-                                            const st = JSON.stringify(Object.values(nesteddValue));
-                                            if(!(st === "[{}]")){
-                                                console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
-                                                if(opt._M)
-                                                {
-                                                    console.trace(o);
-                                                }
-                                                else
-                                                {
-                                                    console.info(o);
-                                                }
-                                            }
-                                            else{
-                                                console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                                                if(opt._M)
-                                                {
-                                                    console.trace(o);
-                                                }
-                                                else
-                                                {
-                                                    console.info(o);
-                                                }
-                                            }
-                                        }else{
+                            }
+                            else
+                            {
+                                if(opt._FailsOnly === 0)            
+                                {                        
+                                    const nesteddValue_ = Object.values(o);
+                                    if(nesteddValue_){
+                                        const nesteddValue = Object.values(nesteddValue_);
+                                        if(typeof Object.values(nesteddValue) == Number )
+                                        {
+                                            return
+                                        }
+                                        const st = JSON.stringify(Object.values(nesteddValue));
+                                        if(!(st === "[{}]")){
                                             console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
                                             if(opt._M)
                                             {
@@ -123,41 +105,67 @@ export const j={
                                                 console.info(o);
                                             }
                                         }
-                                                        
-                                    }
-                                    
-                                }
-                            }
-                            else
-                            {             
-                                if(((typeof o == 'number' && o > 0) || (typeof o == 'boolean' && o == true) || 
-                                (typeof o == 'string' && o.trim().length > 0)))
-                                {
-                                    if(opt._FailsOnly === 0)               
-                                    {
-                                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
-                                        if(opt._M === 1)
+                                        else{
+                                            console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                                            if(opt._M)
+                                            {
+                                                console.trace(o);
+                                            }
+                                            else
                                             {
                                                 console.info(o);
-                                            }                                    
-                                    } 
-                                }
-                                else
-                                {
-                                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                                    if(opt._M)
-                                    {
-                                    console.trace(o);
+                                            }
+                                        }
+                                    }else{
+                                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                                        if(opt._M)
+                                        {
+                                            console.trace(o);
+                                        }
+                                        else
+                                        {
+                                            console.info(o);
+                                        }
                                     }
+                                                    
+                                }
+                                
+                            }
+                        }
+                        else
+                        {             
+                            if(((typeof o == 'number' && o > 0) || (typeof o == 'boolean' && o == true) || 
+                            (typeof o == 'string' && o.trim().length > 0)))
+                            {
+                                if(opt._FailsOnly === 0)               
+                                {
+                                    console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                                    if(opt._M === 1)
+                                        {
+                                            console.info(o);
+                                        }                                    
+                                } 
+                            }
+                            else
+                            {
+                                console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                                if(opt._M)
+                                {
+                                console.trace(o);
                                 }
                             }
-                            
                         }
-                    } catch (error) {
-                        console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                        console.error(error)
+                        
                     }
-                    
+                } catch (error) {
+                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                    console.error(error)
+                }
+                
+            }
+            else
+            {
+                //
             }
         }
     },
@@ -168,6 +176,7 @@ export const j={
             if(opt._T === 1|| opt._R===1 || !(k === 0))
             {       
                 const trackcalls = (opt._Tc++)+" : "; 
+                
                  if(opt._FailsOnly === 1)
                  {
                      //
@@ -176,17 +185,22 @@ export const j={
                  {
                      console.log("%c"+trackcalls+"jTESTING "+title+" :>: "+fTitle,"background-color:#fff;color:purple;");
                  }
+
+                
+
                 return new ComparisonMethods(actual);
             }
             else
             {
                  return new ComparisonMethods(actual);
             }
+
         }
         catch(error)
         {
             console.log(error.message);
         }
+
     },
     check:(title,varString,expectedAnswer,k=0)=>{
         const trackcalls = (opt._Tc++)+" : "; 
@@ -201,15 +215,20 @@ export const j={
                 const res = varString?varString:" nothing.";    
                 console.log("%c"+title,"background-color:purple;color:white;")
                 console.log(varString);   
-                console.log(expectedAnswer);     
-                console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;        
+                console.log(expectedAnswer);  
+                
+                console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;  
+                      
                 return
             }
         }
+        
         opt.TOTAL_TESTS_RUN++;
+    
         if (opt._R || (k !== 0)||(opt._T == 1))
         {
             typeof varString === 'string';
+    
             if(opt._FailsOnly === 1)
             {
                // 
@@ -218,6 +237,7 @@ export const j={
             {
               console.log(tBallConsole,cssBlue);   
             }
+    
             if(varString === undefined || varString == null)
             {
                     opt.TOTAL_TESTS_FAIL++;
@@ -226,6 +246,7 @@ export const j={
             }
             else if(typeof varString === 'string' && typeof expectedAnswer === 'string')
             {
+    
                 if((varString.localeCompare(expectedAnswer)) === 0)
                 {
                     if(opt._FailsOnly === 0)
@@ -241,6 +262,7 @@ export const j={
             }
             else if(typeof varString === 'number' && typeof expectedAnswer === 'number')
             {
+                    
                 if((varString === expectedAnswer) === true)
                 {
                     if(opt._FailsOnly === 0)
@@ -261,6 +283,7 @@ export const j={
             }
             else if(typeof varString === 'boolean' && typeof expectedAnswer === 'boolean')
             {
+     
                 if((varString === expectedAnswer) === true)
                 {
                     if(opt._FailsOnly === 0)
@@ -277,6 +300,7 @@ export const j={
             }
             else if(Array.isArray(varString) && Array.isArray(expectedAnswer))
             {
+   
                 if((compareArrays(varString, expectedAnswer)) === true)
                 {
                     if(opt._FailsOnly === 0)
@@ -295,6 +319,7 @@ export const j={
             {
                 if(opt._T === 1)
                 {       
+        
                         if((compareObjects(varString,expectedAnswer)) === true)
                         {
                             if(opt._FailsOnly === 0)
@@ -316,6 +341,8 @@ export const j={
                 console.log(expectedAnswer);
                 console.log("%c WRONG DATA TYPES GIVEN! First param is of : " + typeof varString + ", Second param is of : " + typeof expectedAnswer,"background-color:#fff;color:red;");
             }
+            
+            
         }
         else
         {
@@ -327,10 +354,13 @@ export const j={
         {
             opt.tS_ = true;
         }   
+        
         if(label && (opt._F || opt._R || !(k == 0)))
         {
             opt._FUNCTIONS.push(label);
+    
             console.log("%cFunc starts : "+opt._FUNCTIONS,"background-color:#fff;color:purple;")
+    
             console.time("TIME : "+label);       
         }
     },
@@ -339,10 +369,13 @@ export const j={
         {
             opt.tS_ = true;
         }   
+        
         if(label && (opt._F || opt._R || !(k == 0)))
         {
             opt._FUNCTIONS.push(label);
+    
             console.log("%cFunc ends : "+opt._FUNCTIONS,"background-color:#fff;color:purple;")
+    
             console.timeEnd("TIME : "+label);       
         }
     },
@@ -358,6 +391,7 @@ export const j={
                 fn()
             } 
         } 
+
         passes(k),fails(k);funcs(k);tests(k);
     },
     hexR : () => {
@@ -400,10 +434,10 @@ export const j={
     chrs:(len=10)=>{        
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_?|[]{}:",.!@#$%^&*()+~`';
         return charProcess(characters,len);
-    }    ,
+ }    ,
     id:()=>{        
         return self.crypto.randomUUID().replace("-","").replace("-","").replace("-","").replace("-","").toUpperCase();
-    },
+    },    
     upperC:(length=10)=>{        
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         return charProcess(characters,length)
@@ -421,6 +455,7 @@ export const j={
         return charProcess(characters,len);
     }
 }
+
 function fails(k=0){
     if(opt._O || opt._T ==1|| opt._R || !(k == 0))
     {
@@ -429,7 +464,9 @@ function fails(k=0){
             console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL,"background-color:#fff;color:darkred;");
         }
     }
+    
 }
+
 function passes(k=0){
     if(opt._O || opt._T ==1|| opt._R || !(k == 0))
     {
@@ -437,7 +474,9 @@ function passes(k=0){
             console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS,"background-color:#fff;color:blue;");
         }
     }
+    
 }
+
 function funcs(k=0){
     if((opt. O || opt._T ==1|| opt._R || opt.tS ) && (!(k == 0) || (opt._FUNCTIONS.length > 0)))
     {
@@ -446,9 +485,14 @@ function funcs(k=0){
         const funcs_ = opt._FUNCTIONS.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
         console.log(funcs_);
     }
+
 }
+
 function tests(k=0){
+
+   
     if(opt.T == 1){opt.tS  = false;}
+
     if((opt.T ==1|| opt._R || opt.tS ) && (!(k == 0) || (opt.TOTAL_TESTS_PASS > 0)))
     {
         console.log("%cTOTAL_TESTS_PASS : " + opt.TOTAL_TESTS_PASS,"background-color:blue;color:#fff;"); 
@@ -465,15 +509,22 @@ function tests(k=0){
     {
         console.log("%cTOTAL_WRONG_DATA_TYPES_PARAMS : " + opt.TOTAL_WRONG_DATA_TYPES_PARAMS,"background-color:blue;color:#fff;"); 
     }
+
 }
+
 const compareArrays = (a, b) => {    
     return JSON.stringify(a) === JSON.stringify(b);
 };
+
 const compareObjects = (a, b) => {    
+
     if(typeof a == 'object' && typeof b == 'object' ){
+
         const aObjElementTotal = a.length;
         const bObjElementTotal = a.length;
+
         const objTotalSame = aObjElementTotal === bObjElementTotal;
+
         if(!objTotalSame){
             return false;
         }
@@ -482,10 +533,12 @@ const compareObjects = (a, b) => {
                 const aKeysArraySorted = aKeysArray.sort();
                 const  aValuesArray = Object.keys(a);
                 const aValuesArraySorted = aValuesArray.sort();
+
                 const  bKeysArray = Object.keys(b);
                 const bKeysArraySorted = bKeysArray.sort();
                 const  bValuesArray = Object.keys(b);
                 const bValuesArraySorted = bValuesArray.sort();
+
                 if(compareArrays(aKeysArraySorted,bKeysArraySorted) && compareArrays(aValuesArraySorted,bValuesArraySorted))
                 {
                     return true;
@@ -494,19 +547,23 @@ const compareObjects = (a, b) => {
                 {
                     return false;
                 }
+
         }    
+
     }
     else{
         return false;
     }
+
 };
+
 class ComparisonMethods {
     constructor(actual,expectedValue="",k=0) {
       this.actual = actual;
       this.expectedValue = expectedValue;
       this.k = k;
     }  
-    between(start,end)
+    between(start,end,k=0)
     {
         if(this.actual >= start && this.actual <= end)
         {
@@ -519,6 +576,7 @@ class ComparisonMethods {
     }
     eq(expected,k=0) 
     {
+
         if (expected === this.actual) 
         {
             pass(this.actual,expected,k); 
@@ -560,6 +618,7 @@ class ComparisonMethods {
       }
     leq(expected,k=0)
     {
+
         if (expected >= this.actual) 
         {
             pass(this.actual,expected,k); 
@@ -587,6 +646,7 @@ class ComparisonMethods {
         else
         {
             const got = this.actual;
+
             if(typeof got == "undefined")
             {
                 fail(this.actual,"contains undefined ",k); 
@@ -596,10 +656,12 @@ class ComparisonMethods {
                 fail(this.actual,"contains null ",k); 
             }     
         }
+        
       }
     null(k=0)
     {
         const nulls = [{empty:null},{empty:undefined},{empty:"null"},{empty:"undefined"},,null, undefined,0,'',"",{empty:[0]},{empty:""},{empty:''},{empty:"0"},{empty:0},{empty:[]},{empty:{}},[0],[],[''],[""],{}]; 
+        
         if (nulls.includes(this.actual)) 
         {
             pass(this.actual,"null",k); 
@@ -698,6 +760,19 @@ class ComparisonMethods {
             fail(this.actual,"num",k); 
         }
       }
+      dec(k=0)
+      {
+          const n = this.actual;
+
+          if ((n - Math.floor(n)) !== 0) 
+          {
+              pass(this.actual,"decimal",k); 
+          } 
+          else 
+          {
+              fail(this.actual,"not a decimal",k); 
+          }
+        }
       range(min=0,max=100,k=0)
       {
           if (this.actual >= min, this.actual <= max) 
@@ -720,7 +795,10 @@ class ComparisonMethods {
             fail(this.actual,"string",k);         
         }
       }
+     
+        
 }
+
 function pass(exp,expectedValue,k)
   {
     if((opt._R === 1)|| (k !== 0)||(opt._T === 1))
@@ -735,9 +813,11 @@ function pass(exp,expectedValue,k)
         }
     }
 }
+
 function fail(exp,expectedValue,k){
     if((opt._FailsOnly === 1) || opt._R || (k !== 0)||(opt._T == 1))
     {   const trackcalls = (opt._Tc++)+" : "; 
+        console.log("%c"+trackcalls+"jTESTING FAIL :>: expecting "+expectedValue,"background-color:#fff;color:purple;");  
         console.log("%cX FAIL : " + exp + " :>>: "+expectedValue,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;opt.TOTAL_TESTS_FAIL++;
         if(opt._Ob === 1)
         {
@@ -745,6 +825,7 @@ function fail(exp,expectedValue,k){
         }
     }
 }
+  
 const charProcess=(characters="abcdefghijklmnopqrstuvwxyz",length=10)=>{
  if(length > 0) 
  {
