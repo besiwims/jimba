@@ -1,8 +1,5 @@
 /*
-Version : 1.2.8 Bernard Sibanda
--- added the new match method named dec
--- between(start,end,k=0)
--- simplified switches
+Version : 1.2.9 - 24-12-2024
 Jimba is a javascript/typescript testing, profiling, logging, tracing library  
 Author:         Bernard Sibanda (Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd)
 License :       MIT License
@@ -23,7 +20,6 @@ What problems does it solve?
 12. One can also selectively test code sections using j.s() and j.e() funcitons for starting and end function profiling
 13. Jimba allows not only object console logging but one can toggle tracing off and on. Also one can toggle testing sections of code on and off
 14. Above all it combines 3 traditonal testing functions describe(), expect() and it() into one j.test()
-
 import {opt,j } from './jimba';
 opt._R = 0; //run all
 opt._FailsOnly = 0; //run only failors
@@ -35,133 +31,7 @@ opt._tNo = 2000; // standard number for iterations on gRvalues which is an objec
 opt._Min = -100; //used by gRvalues for lowest value
 opt._Max = 100; //used by gRvalues for max value
 opt._FUNCTIONS = []; //collects all profiled functions
-
-Examples:
-const test = undefined; j.log({test});j.test("INDEX","test",test)?.contains("null")
-
-const name = "joe"; j.test("TEST","name",name)?.eq("joe")
-
-const computeMult = ((x:number,y:number)=>{
-  return x * y
-})
-const computeAdd = ((x:number,y:number)=>{
-  return x + y
-})
-const computeDiv = ((x:number,y:number)=>{
-  return x / y
-})
-const computeSub = ((x:number,y:number)=>{
-  return x - y
-})
-
-//This is a pack of above functions with their unit test and random values from j.gNo
-const testPack = (()=>{
-  //1
-  const firstNumber1 = j.gNo(-10000,10000),secNumber1 = j.gNo(-10000,10000)
-  const ansMulti = computeMult(firstNumber1,secNumber1); j.check("ansMulti",ansMulti,200)
-  //2
-  const firstNumber2 = j.gNo(-10000,10000),secNumber2 = j.gNo(-10000,10000)
-  const ansAdd = computeAdd(firstNumber2,secNumber2); j.test("before Home","ansAdd",ansAdd)?.neg() 
-  //3
-  const firstNumber3 = j.gNo(-10000,10000),secNumber3 = j.gNo(-10000,10000)
-  const ansDiv = computeDiv(firstNumber3,secNumber3); j.test("before Home","ansDiv",ansDiv)?.num() 
-  //4
-  const firstNumber4 = j.gNo(-10000,10000),secNumber4 = j.gNo(-10000,10000)
-  const ansSub = computeSub(firstNumber4,secNumber4); j.test("before Home","ansSub",ansSub)?.range(100,1000) 
-  //5
-  const complexCall = computeMult(computeAdd(firstNumber4,secNumber2),computeDiv(secNumber3,firstNumber1));j.test("before Home","complexCall",complexCall)?.neg() 
-})
-
-//j.trics(null) use it with null if there is no testPack
-j.trics(testPack); //loops opt._tNo(see const above) times calling each unit test in the testPack  
-
-/* output results 
-
-17991 :  : jcheck ansMulti
-j.js:242 X FAIL : Am expecting 200 but got 80696274
-j.js:167 17992 : jTESTING before Home :>: ansAdd
-j.js:737 ✓ PASS : -2161 :>>: negative
-j.js:167 17994 : jTESTING before Home :>: ansDiv
-j.js:737 ✓ PASS : -7.4268585131894485 :>>: num
-j.js:167 17996 : jTESTING before Home :>: ansSub
-j.js:737 ✓ PASS : -3627 :>>: range pass
-j.js:167 17998 : jTESTING before Home :>: complexCall
-j.js:748 X FAIL : 1325.2892981899017 :>>: negative
-j.js:204 18000 :  : jcheck ansMulti
-j.js:242 X FAIL : Am expecting 200 but got -13546625
-j.js:167 18001 : jTESTING before Home :>: ansAdd
-j.js:748 X FAIL : 6192 :>>: negative
-j.js:167 18003 : jTESTING before Home :>: ansDiv
-j.js:737 ✓ PASS : -0.5619785458879618 :>>: num
-j.js:167 18005 : jTESTING before Home :>: ansSub
-j.js:748 X FAIL : 2038 :>>: range fail
-j.js:167 18007 : jTESTING before Home :>: complexCall
-j.js:748 X FAIL : 2994.9406896551723 :>>: negative
-j.js:427 TOTAL_PASSES : 5092
-j.js:417 TOTAL_ERRORS : 4912
-
-
-//simplified switches
-import {opt,j } from './jimba';
-//--only turn On, More and _FailsOnly to 1 or 0
-const On = 1;
-const More = 0;
-opt._FailsOnly = 0;
-//-----------------do not change below switches
-opt._T = On;
-opt._Ob = More;
-opt._O = On;
-opt._M = More;
-//----------------------------------------------
-
-latest tests below 
-const varb = 89;
-  j.log({varb})
-
-  const g = null;
-  j.log({g})
-
-  function comput(x,y,z){
-    j.s("comput")
-    const sum = x + y + z; j.test("comput","sum = x("+x+") + y("+y+") + z("+z+")",sum)?.num()
-    const sqr = sum * sum; j.test("comput","sqr = sum("+sum+") * sum("+sum+")",sqr)?.neg(0)
-    const red = sqr - 23; j.test("comput","red = sqr("+sqr+") - 23",red)?.num()
-    const avg = red/3; j.test("comput","avg = red("+red+") / 3)",avg)?.pos()
-    const sum_ = x + y + avg;j.test("comput","sum_ = x("+x+") + y("+y+") + avg("+avg+")",sum_)?.object()
-    const sqr_ = sum_ * sum_;j.test("comput","sqr_ = sum_("+sum_+") * sum_("+sum_+")",sqr_)?.geq(1000)
-    const red_ = sqr_ - 84;j.test("comput","red_ = x("+sqr_+") - 84 ",red_)?.dec()
-    const cmp = red_/88-13*8.2;j.test("comput","cmp = x("+red_+")",cmp)?.dec()
-    j.e("comput")
-    return cmp
-  }
-
-  function complex(x,y,z=870){
-    j.s("complex")
-    const sum = x + y + z; j.test("complex","sum = x("+x+") + y("+y+") + z("+z+")",sum)?.num()
-    const sqr = sum * sum; j.test("complex","sqr = sum("+sum+") * sum("+sum+")",sqr)?.geq(0)
-    const red = sqr - 23; j.test("complex","red = sqr("+sqr+") - 23",red)?.num()
-    const avg = red/3; j.test("complex","avg = red("+red+") / 3)",avg)?.pos()
-    const sum_ = x + y + avg;j.test("complex","sum_ = x("+x+") + y("+y+") + avg("+avg+")",sum_)?.pos()
-    const sqr_ = sum_ * sum_;j.test("complex","sqr_ = sum_("+sum_+") * sum_("+sum_+")",sqr_)?.geq(1000)
-    const red_ = sqr_ - 84;j.test("complex","red_ = x("+sqr_+") - 84 ",red_)?.dec()
-    const cmp = red_/88-13*8.2;j.test("complex","cmp = x("+red_+")",cmp)?.dec()
-    j.e("complex")
-    return cmp
-  }
-
-  const testPack = ()=>{
-    const val1 = j.gANo(-100,100);
-    const val2 = j.gANo(-45,87);
-    const val3 = j.gANo(-3,800);
-
-   const avgAns = comput(val1,val2,val3); j.test("testPack","avgAns = comput(val1,val2,val3)",avgAns)?.num()
-    const avgAns2 = complex(val2,val3);  j.test("testPack","avgAns2 = comput(val1,val2,val3)",avgAns2)?.num()
-  }
-
-  j.trics(testPack)
 */
-
-
 export const opt = {
     TOTAL_FAIL : 0, 
     TOTAL_PASS : 0, 
@@ -170,69 +40,79 @@ export const opt = {
     TOTAL_TESTS_RUN :0,
     TOTAL_WRONG_DATA_TYPES_PARAMS :0, //counts wrong parameter types mismatch given to functions
     _R : 0, //run all
-    // _M : 0, // trace frames for o() functions
-    // _FailsOnly :0, //run only failors
-    // _T : 0, // run all tests
-    // _O : 0, //run j log objects tracing
-    // _Ob : 0, //show objects of ComparisonMethods
+    _M : 0, // trace frames for o() functions
+    _FailsOnly :0, //run only failors
+    _T : 0, // run all tests
+    _O : 0, //run j log objects tracing
+    _Ob : 0, //show objects of ComparisonMethods
     _F : 0, // run functions only
-    _Tc : 0, // count tests only
-    _tNo : 1, // standard number for iterations on gRvalues which is an object of arbitraries generators
+    _Tc : 1, // count tests only
+    _tNo : 20, // standard number for iterations on gRvalues which is an object of arbitraries generators
     _Min : -100, //used by gRvalues for lowest value
     _Max : 100, //used by gRvalues for max value
-    _FUNCTIONS : [], //collects all profiled functions  
-    _T : 1,
-    _Ob : 0,
-    _O : 1,
-    _M : 0,
-    _FailsOnly : 0
-    
+    _FUNCTIONS : [], //collects all profiled functions
 }
-
-
-
 export const j={
-    log:(o)=>{
-        if(opt._O === 1 || opt._R === 1)
-            {
-                try 
+    log:(o,stop=false)=>{
+        if(!stop){
+            if(opt._O === 1 || opt._R === 1)
                 {
-                    if(o == null || o == undefined || o == 0 || o == '')
+                    try 
                     {
-                        console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                        if(opt._M === 1)
+                        if(o == null || o == undefined || o == 0 || o == '')
                         {
-                            console.info(o);
-                        }  
-                    }
-                    else
-                    {
-                        if(typeof o == 'object' && o != null)
-                        {
-                            const name = Object.keys(o);  
-                            const val = Object.values(o);  
-                            if(val == '' || val == 0 || val == 'null' || val == 'undefined' || val == ['']) 
+                            console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                            if(opt._M === 1)
                             {
-                                console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-
-                                if(opt._M === 1)            
-                                { 
-                                    console.trace(o);
+                                console.info(o);
+                            }  
+                        }
+                        else
+                        {
+                            if(typeof o == 'object' && o != null)
+                            {
+                                const name = Object.keys(o);  
+                                const val = Object.values(o);  
+                                if(val == '' || val == 0 || val == 'null' || val == 'undefined' || val == ['']) 
+                                {
+                                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                                    console.info(o);
                                 }
-                            }
-                            else
-                            {
-                                if(opt._FailsOnly === 0)            
-                                {                        
-                                    const nesteddValue_ = Object.values(o);
-                                    if(nesteddValue_){
-                                        const nesteddValue = Object.values(nesteddValue_);
-                                        if(typeof Object.values(nesteddValue) == Number )
-                                        {
-                                            return
-                                        }
-                                        const st = JSON.stringify(Object.values(nesteddValue));
-                                        if(!(st === "[{}]")){
+                                else
+                                {
+                                    if(opt._FailsOnly === 0)            
+                                    {                        
+                                        const nesteddValue_ = Object.values(o);
+                                        if(nesteddValue_){
+                                            const nesteddValue = Object.values(nesteddValue_);
+                                            if(typeof Object.values(nesteddValue) == Number )
+                                            {
+                                                return
+                                            }
+                                            const st = JSON.stringify(Object.values(nesteddValue));
+                                            if(!(st === "[{}]")){
+                                                console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                                                if(opt._M)
+                                                {
+                                                    console.trace(o);
+                                                }
+                                                else
+                                                {
+                                                    console.info(o);
+                                                }
+                                            }
+                                            else{
+                                                console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                                                if(opt._M)
+                                                {
+                                                    console.trace(o);
+                                                }
+                                                else
+                                                {
+                                                    console.info(o);
+                                                }
+                                            }
+                                        }else{
                                             console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
                                             if(opt._M)
                                             {
@@ -243,68 +123,43 @@ export const j={
                                                 console.info(o);
                                             }
                                         }
-                                        else{
-                                            console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                                            if(opt._M)
-                                            {
-                                                console.trace(o);
-                                            }
-                                            else
-                                            {
-                                                console.info(o);
-                                            }
-                                        }
-                                    }else{
-                                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
-                                        if(opt._M)
-                                        {
-                                            console.trace(o);
-                                        }
-                                        else
-                                        {
-                                            console.info(o);
-                                        }
+                                                        
                                     }
-                                                    
+                                    
                                 }
-                                
-                            }
-                        }
-                        else
-                        {             
-                            if(((typeof o == 'number' && o > 0) || (typeof o == 'boolean' && o == true) || 
-                            (typeof o == 'string' && o.trim().length > 0)))
-                            {
-                                if(opt._FailsOnly === 0)               
-                                {
-                                    console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
-                                    if(opt._M === 1)
-                                        {
-                                            console.info(o);
-                                        }                                    
-                                } 
                             }
                             else
-                            {
-                                console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                                if(opt._M)
+                            {             
+                                if(((typeof o == 'number' && o > 0) || (typeof o == 'boolean' && o == true) || 
+                                (typeof o == 'string' && o.trim().length > 0)))
                                 {
-                                console.trace(o);
+                                    if(opt._FailsOnly === 0)               
+                                    {
+                                        console.info("%c\u2713 PASS " , "background-color:darkgreen;color:#fff;");opt.TOTAL_PASS++;
+                                        if(opt._M === 1)
+                                            {
+                                                console.info(o);
+                                            }                                    
+                                    } 
+                                }
+                                else
+                                {
+                                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                                    if(opt._M)
+                                    {
+                                    console.trace(o);
+                                    }
                                 }
                             }
+                            
                         }
-                        
+                    } catch (error) {
+                        console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
+                        console.error(error)
                     }
-                } catch (error) {
-                    console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                    console.error(error)
-                }
-                
+                    
             }
-            else
-            {
-                //
-            }
+        }
     },
     test:(title,fTitle,actual,k=0)=>
     {
@@ -313,7 +168,6 @@ export const j={
             if(opt._T === 1|| opt._R===1 || !(k === 0))
             {       
                 const trackcalls = (opt._Tc++)+" : "; 
-                
                  if(opt._FailsOnly === 1)
                  {
                      //
@@ -322,22 +176,17 @@ export const j={
                  {
                      console.log("%c"+trackcalls+"jTESTING "+title+" :>: "+fTitle,"background-color:#fff;color:purple;");
                  }
-
-                
-
                 return new ComparisonMethods(actual);
             }
             else
             {
                  return new ComparisonMethods(actual);
             }
-
         }
         catch(error)
         {
             console.log(error.message);
         }
-
     },
     check:(title,varString,expectedAnswer,k=0)=>{
         const trackcalls = (opt._Tc++)+" : "; 
@@ -352,20 +201,15 @@ export const j={
                 const res = varString?varString:" nothing.";    
                 console.log("%c"+title,"background-color:purple;color:white;")
                 console.log(varString);   
-                console.log(expectedAnswer);  
-                
-                console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;  
-                      
+                console.log(expectedAnswer);     
+                console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;        
                 return
             }
         }
-        
         opt.TOTAL_TESTS_RUN++;
-    
         if (opt._R || (k !== 0)||(opt._T == 1))
         {
             typeof varString === 'string';
-    
             if(opt._FailsOnly === 1)
             {
                // 
@@ -374,7 +218,6 @@ export const j={
             {
               console.log(tBallConsole,cssBlue);   
             }
-    
             if(varString === undefined || varString == null)
             {
                     opt.TOTAL_TESTS_FAIL++;
@@ -383,7 +226,6 @@ export const j={
             }
             else if(typeof varString === 'string' && typeof expectedAnswer === 'string')
             {
-    
                 if((varString.localeCompare(expectedAnswer)) === 0)
                 {
                     if(opt._FailsOnly === 0)
@@ -399,7 +241,6 @@ export const j={
             }
             else if(typeof varString === 'number' && typeof expectedAnswer === 'number')
             {
-                    
                 if((varString === expectedAnswer) === true)
                 {
                     if(opt._FailsOnly === 0)
@@ -420,7 +261,6 @@ export const j={
             }
             else if(typeof varString === 'boolean' && typeof expectedAnswer === 'boolean')
             {
-     
                 if((varString === expectedAnswer) === true)
                 {
                     if(opt._FailsOnly === 0)
@@ -437,7 +277,6 @@ export const j={
             }
             else if(Array.isArray(varString) && Array.isArray(expectedAnswer))
             {
-   
                 if((compareArrays(varString, expectedAnswer)) === true)
                 {
                     if(opt._FailsOnly === 0)
@@ -456,7 +295,6 @@ export const j={
             {
                 if(opt._T === 1)
                 {       
-        
                         if((compareObjects(varString,expectedAnswer)) === true)
                         {
                             if(opt._FailsOnly === 0)
@@ -478,8 +316,6 @@ export const j={
                 console.log(expectedAnswer);
                 console.log("%c WRONG DATA TYPES GIVEN! First param is of : " + typeof varString + ", Second param is of : " + typeof expectedAnswer,"background-color:#fff;color:red;");
             }
-            
-            
         }
         else
         {
@@ -491,13 +327,10 @@ export const j={
         {
             opt.tS_ = true;
         }   
-        
         if(label && (opt._F || opt._R || !(k == 0)))
         {
             opt._FUNCTIONS.push(label);
-    
             console.log("%cFunc starts : "+opt._FUNCTIONS,"background-color:#fff;color:purple;")
-    
             console.time("TIME : "+label);       
         }
     },
@@ -506,13 +339,10 @@ export const j={
         {
             opt.tS_ = true;
         }   
-        
         if(label && (opt._F || opt._R || !(k == 0)))
         {
             opt._FUNCTIONS.push(label);
-    
             console.log("%cFunc ends : "+opt._FUNCTIONS,"background-color:#fff;color:purple;")
-    
             console.timeEnd("TIME : "+label);       
         }
     },
@@ -528,7 +358,6 @@ export const j={
                 fn()
             } 
         } 
-
         passes(k),fails(k);funcs(k);tests(k);
     },
     hexR : () => {
@@ -571,6 +400,9 @@ export const j={
     chrs:(len=10)=>{        
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_?|[]{}:",.!@#$%^&*()+~`';
         return charProcess(characters,len);
+    }    ,
+    id:()=>{        
+        return self.crypto.randomUUID().replace("-","").replace("-","").replace("-","").replace("-","").toUpperCase();
     },
     upperC:(length=10)=>{        
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -589,7 +421,6 @@ export const j={
         return charProcess(characters,len);
     }
 }
-
 function fails(k=0){
     if(opt._O || opt._T ==1|| opt._R || !(k == 0))
     {
@@ -598,9 +429,7 @@ function fails(k=0){
             console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL,"background-color:#fff;color:darkred;");
         }
     }
-    
 }
-
 function passes(k=0){
     if(opt._O || opt._T ==1|| opt._R || !(k == 0))
     {
@@ -608,9 +437,7 @@ function passes(k=0){
             console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS,"background-color:#fff;color:blue;");
         }
     }
-    
 }
-
 function funcs(k=0){
     if((opt. O || opt._T ==1|| opt._R || opt.tS ) && (!(k == 0) || (opt._FUNCTIONS.length > 0)))
     {
@@ -619,14 +446,9 @@ function funcs(k=0){
         const funcs_ = opt._FUNCTIONS.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
         console.log(funcs_);
     }
-
 }
-
 function tests(k=0){
-
-   
     if(opt.T == 1){opt.tS  = false;}
-
     if((opt.T ==1|| opt._R || opt.tS ) && (!(k == 0) || (opt.TOTAL_TESTS_PASS > 0)))
     {
         console.log("%cTOTAL_TESTS_PASS : " + opt.TOTAL_TESTS_PASS,"background-color:blue;color:#fff;"); 
@@ -643,22 +465,15 @@ function tests(k=0){
     {
         console.log("%cTOTAL_WRONG_DATA_TYPES_PARAMS : " + opt.TOTAL_WRONG_DATA_TYPES_PARAMS,"background-color:blue;color:#fff;"); 
     }
-
 }
-
 const compareArrays = (a, b) => {    
     return JSON.stringify(a) === JSON.stringify(b);
 };
-
 const compareObjects = (a, b) => {    
-
     if(typeof a == 'object' && typeof b == 'object' ){
-
         const aObjElementTotal = a.length;
         const bObjElementTotal = a.length;
-
         const objTotalSame = aObjElementTotal === bObjElementTotal;
-
         if(!objTotalSame){
             return false;
         }
@@ -667,12 +482,10 @@ const compareObjects = (a, b) => {
                 const aKeysArraySorted = aKeysArray.sort();
                 const  aValuesArray = Object.keys(a);
                 const aValuesArraySorted = aValuesArray.sort();
-
                 const  bKeysArray = Object.keys(b);
                 const bKeysArraySorted = bKeysArray.sort();
                 const  bValuesArray = Object.keys(b);
                 const bValuesArraySorted = bValuesArray.sort();
-
                 if(compareArrays(aKeysArraySorted,bKeysArraySorted) && compareArrays(aValuesArraySorted,bValuesArraySorted))
                 {
                     return true;
@@ -681,23 +494,19 @@ const compareObjects = (a, b) => {
                 {
                     return false;
                 }
-
         }    
-
     }
     else{
         return false;
     }
-
 };
-
 class ComparisonMethods {
     constructor(actual,expectedValue="",k=0) {
       this.actual = actual;
       this.expectedValue = expectedValue;
       this.k = k;
     }  
-    between(start,end,k=0)
+    between(start,end)
     {
         if(this.actual >= start && this.actual <= end)
         {
@@ -710,7 +519,6 @@ class ComparisonMethods {
     }
     eq(expected,k=0) 
     {
-
         if (expected === this.actual) 
         {
             pass(this.actual,expected,k); 
@@ -752,7 +560,6 @@ class ComparisonMethods {
       }
     leq(expected,k=0)
     {
-
         if (expected >= this.actual) 
         {
             pass(this.actual,expected,k); 
@@ -780,7 +587,6 @@ class ComparisonMethods {
         else
         {
             const got = this.actual;
-
             if(typeof got == "undefined")
             {
                 fail(this.actual,"contains undefined ",k); 
@@ -790,12 +596,10 @@ class ComparisonMethods {
                 fail(this.actual,"contains null ",k); 
             }     
         }
-        
       }
     null(k=0)
     {
         const nulls = [{empty:null},{empty:undefined},{empty:"null"},{empty:"undefined"},,null, undefined,0,'',"",{empty:[0]},{empty:""},{empty:''},{empty:"0"},{empty:0},{empty:[]},{empty:{}},[0],[],[''],[""],{}]; 
-        
         if (nulls.includes(this.actual)) 
         {
             pass(this.actual,"null",k); 
@@ -894,19 +698,6 @@ class ComparisonMethods {
             fail(this.actual,"num",k); 
         }
       }
-      dec(k=0)
-      {
-          const n = this.actual;
-
-          if ((n - Math.floor(n)) !== 0) 
-          {
-              pass(this.actual,"decimal",k); 
-          } 
-          else 
-          {
-              fail(this.actual,"not a decimal",k); 
-          }
-        }
       range(min=0,max=100,k=0)
       {
           if (this.actual >= min, this.actual <= max) 
@@ -929,10 +720,7 @@ class ComparisonMethods {
             fail(this.actual,"string",k);         
         }
       }
-     
-        
 }
-
 function pass(exp,expectedValue,k)
   {
     if((opt._R === 1)|| (k !== 0)||(opt._T === 1))
@@ -947,11 +735,9 @@ function pass(exp,expectedValue,k)
         }
     }
 }
-
 function fail(exp,expectedValue,k){
     if((opt._FailsOnly === 1) || opt._R || (k !== 0)||(opt._T == 1))
     {   const trackcalls = (opt._Tc++)+" : "; 
-        console.log("%c"+trackcalls+"jTESTING FAIL :>: expecting "+expectedValue,"background-color:#fff;color:purple;");  
         console.log("%cX FAIL : " + exp + " :>>: "+expectedValue,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;opt.TOTAL_TESTS_FAIL++;
         if(opt._Ob === 1)
         {
@@ -959,7 +745,6 @@ function fail(exp,expectedValue,k){
         }
     }
 }
-  
 const charProcess=(characters="abcdefghijklmnopqrstuvwxyz",length=10)=>{
  if(length > 0) 
  {
