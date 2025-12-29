@@ -32,7 +32,9 @@
 ## Tests online
 
 Before going further, view and inspect Jimba tests here : https://coxygen.co/coxygen.co/demo/28122025/tests.html
+
 Also fork it here : https://github.com/besiwims/jimba
+
 NPM link : https://www.npmjs.com/package/jimba?activeTab=readme
 
 Raise issues here : https://github.com/besiwims/jimba/issues
