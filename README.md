@@ -29,6 +29,14 @@
 20. API reference (short, beginner-friendly)
 21. Glossary of terms
 
+## Tests online
+
+Before going further, view and inspect Jimba tests here : https://coxygen.co/coxygen.co/demo/28122025/tests.html
+Also fork it here : https://github.com/besiwims/jimba
+NPM link : https://www.npmjs.com/package/jimba?activeTab=readme
+
+Raise issues here : https://github.com/besiwims/jimba/issues
+
 ## 1. What Jimba.js is and why it exists
 
 Jimba.js is a small JavaScript/TypeScript library that helps you **test**, **log**, and **profile** your frontend code while you are building it. Many developers use `console.log()` when they are stuck, but they later remove those logs because they look messy and can slow down an application. Console.log() does not do unit testing. Testing libraries like Jest and Mocha are powerful, but beginners often avoid them because they feel like extra work and require setup.
@@ -87,7 +95,7 @@ If you are working with a plain HTML file (no build tools), you normally include
 
 Example (browser):
 
-```html
+```Javascript
 <script type="module">
   import { opt, j } from "./jimba.js";
 
