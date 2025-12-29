@@ -1,5 +1,9 @@
 /*
-Version : 1.2.4
+Version : 1.2.9 24-12-2024 Bernard Sibanda
+-- added the new match method named dec
+-- between(start,end,k=0)
+-- simplified switches
+-- updated readme
 Jimba is a javascript/typescript testing, profiling, logging, tracing library  
 Author:         Bernard Sibanda (Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd)
 License :       MIT License
@@ -97,9 +101,101 @@ j.js:748 X FAIL : 2994.9406896551723 :>>: negative
 j.js:427 TOTAL_PASSES : 5092
 j.js:417 TOTAL_ERRORS : 4912
 
+
+//simplified switches
+import {opt,j } from './jimba';
+//--only turn On, More and _FailsOnly to 1 or 0
+const On = 1;
+const More = 0;
+opt._FailsOnly = 0;
+//-----------------do not change below switches
+opt._T = On;
+opt._Ob = More;
+opt._O = On;
+opt._M = More;
+//----------------------------------------------
+
+latest tests below 
+const varb = 89;
+  j.log({varb})
+
+  const g = null;
+  j.log({g})
+
+  function comput(x,y,z){
+    j.s("comput")
+    const sum = x + y + z; j.test("comput","sum = x("+x+") + y("+y+") + z("+z+")",sum)?.num()
+    const sqr = sum * sum; j.test("comput","sqr = sum("+sum+") * sum("+sum+")",sqr)?.neg(0)
+    const red = sqr - 23; j.test("comput","red = sqr("+sqr+") - 23",red)?.num()
+    const avg = red/3; j.test("comput","avg = red("+red+") / 3)",avg)?.pos()
+    const sum_ = x + y + avg;j.test("comput","sum_ = x("+x+") + y("+y+") + avg("+avg+")",sum_)?.object()
+    const sqr_ = sum_ * sum_;j.test("comput","sqr_ = sum_("+sum_+") * sum_("+sum_+")",sqr_)?.geq(1000)
+    const red_ = sqr_ - 84;j.test("comput","red_ = x("+sqr_+") - 84 ",red_)?.dec()
+    const cmp = red_/88-13*8.2;j.test("comput","cmp = x("+red_+")",cmp)?.dec()
+    j.e("comput")
+    return cmp
+  }
+
+  function complex(x,y,z=870){
+    j.s("complex")
+    const sum = x + y + z; j.test("complex","sum = x("+x+") + y("+y+") + z("+z+")",sum)?.num()
+    const sqr = sum * sum; j.test("complex","sqr = sum("+sum+") * sum("+sum+")",sqr)?.geq(0)
+    const red = sqr - 23; j.test("complex","red = sqr("+sqr+") - 23",red)?.num()
+    const avg = red/3; j.test("complex","avg = red("+red+") / 3)",avg)?.pos()
+    const sum_ = x + y + avg;j.test("complex","sum_ = x("+x+") + y("+y+") + avg("+avg+")",sum_)?.pos()
+    const sqr_ = sum_ * sum_;j.test("complex","sqr_ = sum_("+sum_+") * sum_("+sum_+")",sqr_)?.geq(1000)
+    const red_ = sqr_ - 84;j.test("complex","red_ = x("+sqr_+") - 84 ",red_)?.dec()
+    const cmp = red_/88-13*8.2;j.test("complex","cmp = x("+red_+")",cmp)?.dec()
+    j.e("complex")
+    return cmp
+  }
+
+  const testPack = ()=>{
+    const val1 = j.gANo(-100,100);
+    const val2 = j.gANo(-45,87);
+    const val3 = j.gANo(-3,800);
+
+   const avgAns = comput(val1,val2,val3); j.test("testPack","avgAns = comput(val1,val2,val3)",avgAns)?.num()
+    const avgAns2 = complex(val2,val3);  j.test("testPack","avgAns2 = comput(val1,val2,val3)",avgAns2)?.num()
+  }
+
+  j.trics(testPack)
 */
 
-
+/*
+Version : 1.2.9 24-12-2024
+Jimba is a javascript/typescript testing, profiling, logging, tracing library  
+Author:         Bernard Sibanda (Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd)
+License :       MIT License
+Installation :  npm i jimba 
+Date Started:   2021
+What problems does it solve?
+1. Trap bugs via short unit tests injected at the end of the line. E.g. const answer = add(2,4); j.test("Home", " Adding 2 and 4 must give 6",answer)
+2. No need to remove the j tests like we do remove the console log because it guards against changes in tested code snippets or variables
+3. Most developers are not testing because it is triple work, time consuming and expensive. Jimba.js solves this by adding tests snippets at every variable and function calls without bloating the code.
+4. Jimba js is a Swiss knife: It is not only improved console.log, it is not just tracing code execution to track computation but comprehensive unit testing for javascript
+5. Most simple tests or console logs use simple samples to test but Jimba copies quick test method of using arbitraries values and generating these with various ranges.
+6. It has zero dependence and it is very small in size and has very few things to use
+7. It speeds up javascript testing.
+8. Helps also introduces testing using other libraries Mocha, Jest, Vite but is better because it is very much simplified.
+9. Begins property based testing in a very simple way...
+10. Very easy to install : add a script tag on a website/webapp on simple run `npm i jimba` or `npm i jimba --force`
+11. A developer who needs his/her code to run fast needs to switch jimba off using the opt... switches at every page.
+12. One can also selectively test code sections using j.s() and j.e() funcitons for starting and end function profiling
+13. Jimba allows not only object console logging but one can toggle tracing off and on. Also one can toggle testing sections of code on and off
+14. Above all it combines 3 traditonal testing functions describe(), expect() and it() into one j.test()
+import {opt,j } from './jimba';
+opt._R = 0; //run all
+opt._FailsOnly = 0; //run only failors
+opt._T = 1; // run all tests
+opt._O = 0; //run j log objects tracing
+opt._Ob = 0; //show objects of ComparisonMethods
+opt._F = 0; // run functions only
+opt._tNo = 2000; // standard number for iterations on gRvalues which is an object of arbitraries generators
+opt._Min = -100; //used by gRvalues for lowest value
+opt._Max = 100; //used by gRvalues for max value
+opt._FUNCTIONS = []; //collects all profiled functions
+*/
 const opt = {
     TOTAL_FAIL : 0, 
     TOTAL_PASS : 0, 
@@ -120,9 +216,9 @@ const opt = {
     _Max : 100, //used by gRvalues for max value
     _FUNCTIONS : [], //collects all profiled functions
 };
-
 const j={
-    log:(o)=>{
+   log:(o,stop=false)=>{
+        if(!stop){
         if(opt._O === 1 || opt._R === 1)
             {
                 try 
@@ -144,7 +240,11 @@ const j={
                             if(val == '' || val == 0 || val == 'null' || val == 'undefined' || val == ['']) 
                             {
                                 console.info("%cX FAIL " , "background-color:darkred;color:#fff;");opt.TOTAL_FAIL++;
-                                console.info(o);
+
+                                if(opt._M === 1)            
+                                { 
+                                    console.trace(o);
+                                }
                             }
                             else
                             {
@@ -227,6 +327,7 @@ const j={
                 }
                 
             }
+        }
     },
     test:(title,fTitle,actual,k=0)=>
     {
@@ -273,8 +374,10 @@ const j={
                 opt.TOTAL_TESTS_FAIL++;
                 console.log("%c"+title,"background-color:purple;color:white;");
                 console.log(varString);   
-                console.log(expectedAnswer);     
-                console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;        
+                console.log(expectedAnswer);  
+                
+                console.log("%cX FAIL : First three parameters are mandatory!","background-color:#fff;color:red;");opt.TOTAL_FAIL++;  
+                      
                 return
             }
         }
@@ -482,7 +585,10 @@ const j={
     chrs:(len=10)=>{        
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_?|[]{}:",.!@#$%^&*()+~`';
         return charProcess(characters,len);
-    },
+ }    ,
+    id:()=>{        
+        return self.crypto.randomUUID().replace("-","").replace("-","").replace("-","").replace("-","").toUpperCase();
+    },    
     upperC:(length=10)=>{        
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         return charProcess(characters,length)
@@ -608,7 +714,7 @@ class ComparisonMethods {
       this.expectedValue = expectedValue;
       this.k = k;
     }  
-    between(start,end)
+    between(start,end,k=0)
     {
         if(this.actual >= start && this.actual <= end)
         {
@@ -696,7 +802,7 @@ class ComparisonMethods {
             {
                 fail(this.actual,"contains undefined ",k); 
             }
-            else if(typeof got == "null")
+            else if(got === "null")
             {
                 fail(this.actual,"contains null ",k); 
             }     
@@ -804,19 +910,21 @@ class ComparisonMethods {
         {
             fail(this.actual,"num",k); 
         }
-    }
-    length(n,k=0)
-    {
-        if (this.actual.length === n) 
-        {
-            pass(this.actual.length,"length",k); 
-        } 
-        else 
-        {
-            fail(this.actual.length,"length",k); 
+      }
+      dec(k=0)
+      {
+          const n = this.actual;
+
+          if ((n - Math.floor(n)) !== 0) 
+          {
+              pass(this.actual,"decimal",k); 
+          } 
+          else 
+          {
+              fail(this.actual,"not a decimal",k); 
+          }
         }
-    }
-    range(min=0,max=100,k=0)
+      range(min=0,max=100,k=0)
       {
           if (this.actual >= min, this.actual <= max) 
           {
@@ -859,7 +967,8 @@ function pass(exp,expectedValue,k)
 
 function fail(exp,expectedValue,k){
     if((opt._FailsOnly === 1) || opt._R || (k !== 0)||(opt._T == 1))
-    {   (opt._Tc++)+" : "; 
+    {   const trackcalls = (opt._Tc++)+" : "; 
+        console.log("%c"+trackcalls+"jTESTING FAIL :>: expecting "+expectedValue,"background-color:#fff;color:purple;");  
         console.log("%cX FAIL : " + exp + " :>>: "+expectedValue,"background-color:#fff;color:red;");opt.TOTAL_FAIL++;opt.TOTAL_TESTS_FAIL++;
         if(opt._Ob === 1)
         {

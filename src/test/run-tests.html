@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Jimba Unit Tests</title>
+    <style>
+      body { font-family: system-ui, sans-serif; padding: 16px; }
+      #out {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        white-space: pre-wrap;
+        background: #0b1220;
+        padding: 12px;
+        border-radius: 10px;
+        line-height: 1.35;
+      }
+      .ok { color: #16a34a; font-weight: 800; }
+      .bad { color: #ef4444; font-weight: 800; }
+      .dim { color: #94a3b8; }
+    </style>
+  </head>
+  <body>
+    <h1>Jimba Unit Tests</h1>
+    <div id="status">Running…</div>
+    <div id="out"></div>
+
+    <script type="module" src="./run-tests.js"></script>
+  </body>
+</html>

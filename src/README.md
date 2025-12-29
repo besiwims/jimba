@@ -1,225 +1,462 @@
-*Table of Contents**
-1. [Library Overview](#library-overview)
-2. [Author Information](#author-information)
-3. [License](#license)
-4. [Installation Instructions](#installation-instructions)
-5. [Usage](#usage)
-6. [Automated Testing](#automated-testing)
-7. [Matchers Functions](#matchers-functions)
-8. [Function Speed Measurement](#function-speed-measurement)
-9. [Feedback and Contact](#feedback-and-contact)
----
-### 0. Version 1.2.8
+## Jimba.js User Guide (v1.3.6) 
 
-Please use these latest updated code
+**Author:**   Bernard Sibanda
+**Company:**  Coxygen Global
+**Date:**     29 December 2025
+**License:**  MIT
+
+## Table of Contents
+
+1. What Jimba.js is and why it exists
+2. What you need before you start
+3. Installing Jimba.js in a browser project
+4. Installing Jimba.js in Node.js
+5. Understanding the two main parts: `opt` and `j`
+6. Turning features on and off with `opt` (explained slowly)
+7. Logging values with `j.log()` (INFO output)
+8. Testing values with `j.test()` (PASS/FAIL output)
+9. Understanding the assertion methods (what `.num()`, `.neg()`, etc. mean)
+10. Using `j.check()` for simple equality checks
+11. Profiling function time with `j.s()` and `j.e()`
+12. Counting how many times functions run with `_FUNCTIONS`
+13. Repeating tests with `j.rTP()` and `j.trics()` (property-style testing)
+14. Using Jimba’s random generators (`gNo`, `gANo`, `gBool`, etc.)
+15. A complete beginner example (copy/paste)
+16. A complete “comput/complex” example (explained line-by-line)
+17. Reading the console output like a professional
+18. Common mistakes and how to fix them
+19. Frameworks and environments that can use Jimba.js
+20. API reference (short, beginner-friendly)
+21. Glossary of terms
+
+## 1. What Jimba.js is and why it exists
+
+Jimba.js is a small JavaScript/TypeScript library that helps you **test**, **log**, and **profile** your frontend code while you are building it. Many developers use `console.log()` when they are stuck, but they later remove those logs because they look messy and can slow down an application. Console.log() does not do unit testing. Testing libraries like Jest and Mocha are powerful, but beginners often avoid them because they feel like extra work and require setup.
+
+Jimba.js was built to reduce that friction. Instead of writing large test files, you can add **short tests directly next to the code you are working on**. This makes it easier to catch bugs early and also makes it harder for future changes to silently break logic, because your small tests remain in the code and still check your assumptions.
+
+Jimba.js is also useful when you want to understand performance. It can count how many times a function runs and can measure how long a function takes to execute.
+
+## 2. What you need before you start
+
+### j.log() is Console.log() with testing and logging
+
+All you need to get started on static websites is a script tag <script type="./jimba.js"></script>
+
+Jimba(Catch) all your bugs both at development, compile time and at runtime via Effects/Schema or Zod.
+
 ```
-//------------------start copy---------------------------
-//simplified switches
-import {opt,j } from './jimba';
-//--only turn On, More and _FailsOnly to 1 or 0
-const On = 1;
-const More = 0;
-opt._FailsOnly = 0;
-//-----------------do not change below switches
-opt._T = On;
-opt._Ob = More;
-opt._O = On;
-opt._M = More;
-//--------------------end copy---------------------
+import {opt,j } from './jimba.js'; //import this js small file and turn on switches below _O and _T for console.logging and testing at the same time 
+opt._R = 0; //run all
+opt._FailsOnly = 0; //run only failors
+opt._T = 1; // run all tests
+opt._O = 1; //run j log objects tracing
+opt._F = 0; // run functions only
+opt._tNo = 20; // standard number for iterations on gRvalues which is an object of arbitraries generators
+opt._Min = -10; //used by gRvalues for lowest value
+opt._Max = 10; //used by gRvalues for max value
+opt._FUNCTIONS = Object.create(null);  //collects all profiled functions
+
+//Do this always in one line. This makes code on the left clean, none poluted with console.logs that always require deletions
+
+const age = 78; j.log({age}); j.test("Group A Tests", "Variable age", age).pos();  
+const childAge = -5; j.log({childAge}); j.test("Group A Tests", "Variable childAge", childAge).pos();  
 ```
-### 1. Library Overview
-Jimba is a javascript console log wrapping, variables/objects/arrays testing, functions/page profiling library. Its purpose is to introduce testing from simple console logs all the way to unit testing with bigger frameworks.
+#### Results:
 
-### 2. Author Information
-- **Author:** Bernard Sibanda
-- **Affiliations:** Tobb Technologies Pty Ltd, Women In Move Solutions Pty Ltd
+INFO {age: 78} at jimba.html:21:28 jimba.js:141. 
+✓ PASS positive 78 jimba.html:21:42 • Variable age
 
-### 3. License
-MIT License
+INFO {childAge: -5} at jimba.html:23:30 jimba.js:141 
+✗ FAIL positive -5 jimba.html:23:49 • Variable childAge
 
-### 4. Installation Instructions
-- **NPM:** Run `npm i jimba` to install via npm.
-- **Website:** Create and add the script tag to the `jimba.js` file by copying the contents from GitHub.
+That's it! There is no need for console.log() because you cannot switch it off like j.log({}). You stop all logging and tests by setting opt._O and opt._T to 1.
 
-### 5. Usage
-Installation using nodejs npm. On the vscode terminal run `npm i jimba` or `npm i jimba --force` if there are dependency issues.
+You do not need to be an expert to use Jimba.js, but you do need to understand a few basics:
 
-### 6. Typescript, javascript Automated Testing, logging, tracing using one tool jimba.js
-What is jimba.js? 
-It is a tool/library for testing, checking, logging, tracing variables, objects, functions and profiling code speed. This tool/library is meant to make 
-testing part and parcel of writing coding. It simplifies test driven development by allowing to test and write code on the same file. The same way we write code and 
-write console.log on the same file.
-What problems does it solve?
-1. Trap bugs via short unit tests injected at the end of the line. E.g. const answer = add(2,4); j.test("Home", " Adding 2 and 4 must give 6",answer)
-2. No need to remove the j tests like we do remove the console log because it guards against changes in tested code snippets or variables
-3. Most developers are not testing because it is triple work, time consuming and expensive. Jimba.js solves this by adding tests snippets at every variable and function calls without bloating the code.
-4. Jimba js is a Swiss knife: It is not only improved console.log, it is not just tracing code execution to track computation but comprehensive unit testing for javascript
-5. Most simple tests or console logs use simple samples to test but Jimba copies quick test method of using arbitraries values and generating these with various ranges.
-6. It has zero dependence and it is very small in size and has very few things to use
-7. It speeds up javascript testing.
-8. Helps also introduces testing using other libraries Mocha, Jest, Vite but is better because it is very much simplified.
-9. Begins property based testing in a very simple way...
-10. Very easy to install : add a script tag on a website/webapp on simple run `npm i jimba` or `npm i jimba --force`
-11. A developer who needs his/her code to run fast needs to switch jimba off using the opt... switches at every page.
-12. One can also selectively test code sections using j.s() and j.e() funcitons for starting and end function profiling
-13. Jimba allows not only object console logging but one can toggle tracing off and on. Also one can toggle testing sections of code on and off
-14. Above all it combines 3 traditonal testing functions describe(), expect() and it() into one j.test()
+* JavaScript variables store values like numbers, strings, and objects.
+* Functions are blocks of code that run when you call them.
+* A browser console is where logs and errors appear.
+* “Testing” means checking that something is true, like “this result must be a number.”
 
-Below are examples of the jimba version 1.2.1
-```
-The jtest, jj() and o(), tS(), tE() functions have been improved and bungled as one object j{s(),e(),log(),test(),check()}.
-```
-This makes using the logs, tests and checks very easy because you have to just call j on the vscode and the methods will show.
-This now only requires a developer to call 3 objects : opt,gRValues and j, and 1 functions namely jtrics() for results.
-Carefully check the tests samples  below including the simplified switches.
-```
-import {opt,j} from 'jimba';
- //switches
-  opt._R = 0;           //run all
+If any of these words feel new, do not worry. This guide explains them as we go, and there is a glossary at the end.
 
-  opt._O = 1;           //run o() function calls
-  opt._M = 0;           //show stack frames for objects
+## 3. Installing Jimba.js in a browser project
 
-  opt._F = 0;           //run functions
+If you are working with a plain HTML file (no build tools), you normally include JavaScript using a `<script>` tag. Jimba.js is an ES Module, so you will import it inside a `<script type="module">`.
 
-  opt._T = 1;           //jtest, jj, jescribe i.e. tests
-  opt._FailsOnly = 0;   //run only failing tests
-  opt._Ob = 0;          //show stack frames
+Example (browser):
 
-  Examples :
-   
-   const add =(x : any,y:any)=>{ j.s("add"); //start
-    //...more code
-    //...code to measure time
-    j.e("add"); //end
-    return x + y;
-  }
-  const ans = add(9,9);
-  j.log(ans);
-  j.test("Home","add 9 & 9 = 18",ans)?.eq(18)
-  const ans1 = add(9,80);
-  j.test("Home","add 9 & 80 > 18",ans1)?.geq(18)
-  const ans2 = add(2,8);
-   j.test("Home","add 2 8  <= 18",ans2)?.leq(18)
-  const ans3 = add(9,8);
-  j.test("Home","add 9 & 8 > 10",ans3)?.gt(10)
-   const ans4 = add(9,2);
-  j.test("Home","add 9 & 2 < 18",ans4)?.lt(18)
-  const ans5 = null;
-  j.test("Home","ans5 is null",ans5)?.null()
-  const ans6 = {object:""};  
-  j.test("Home","ans6 is object",ans6)?.object()
-  const ans7 : [] = [];
-  j.test("Home","ans7 is array",ans7)?.array()
-  const ans8 = add(-10,8);
-  j.test("Home","add -10 plus 8 = negative",ans8)?.neg()
-  const ans9 = add(9,8);
-  j.test("Home","add 9 & 8 > 18",ans9)?.pos()
-  const ans10 = add(9,8);
-  j.test("Home","add 9 & 8 > 18",ans10)?.num()
-  const ans11 = false;
-  j.test("Home","false is bool",ans11)?.bool()
-  const ans12 = "james";
-  j.test("Home","add 9 & 8 > 18",ans12)?.string()
-  const ans13 = add(-12,76);
-  j.test("Home","add 9 & 8 > 18",ans13)?.notNull()
-  const name = "james"; j.log({name})
-  const tmpe = 0; j.log(tmpe)
+```html
+<script type="module">
+  import { opt, j } from "./jimba.js";
 
-  function concateNames(name1:string,name2:string) {
-    return name1+name2;
-  }
+  opt._O = 1; // enable INFO logging
+  opt._T = 1; // enable tests
 
-  function cNulls (){
-    return j.gNull(10)
-  } 
+  const readFileName = () => { return null};
+  const fileName = readFileName();  j.log({ fileName });  j.test("Group B Tests", "Reading File name", fileName).string();
   
-  const discodancers = (name)=>{
-    return name + " is a dancer";
+/** results
+✗ FAIL {fileName: null} at jimba.html:130:41 jimba.js:215
+✗ FAIL string null jimba.html:130:63 • Reading File name
+*/
+
+</script>
+```
+
+This is the simplest way to start, because you can refresh the page and immediately see output in the developer console.
+
+## 4. Installing Jimba.js in Node.js
+
+If you use Node.js, you install packages with npm:
+
+```bash
+npm i jimba
+```
+
+Then you import it from your code. If your Node project uses ES Modules (recommended), you do:
+
+```js
+import { opt, j } from "jimba";
+```
+
+If your project still uses CommonJS (`require`), you will either need a compatible build or a CommonJS wrapper, because the code you provided is written as ES Module exports.
+
+## 5. Understanding the two main parts: `opt` and `j`
+
+Jimba.js exposes two main things:
+
+1. `opt` — a configuration object.
+2. `j` — the main toolbox containing functions like `j.log({})`, `j.trics`,`j.log()` and `j.test()`.
+
+A beginner-friendly way to think about it is:
+
+* `opt` is the “settings panel”.
+* `j` is the “toolkit”.
+
+You usually import them like this:
+
+```js
+import { opt, j } from "./jimba.js";
+```
+
+## 6. Turning features on and off with `opt` (explained slowly)
+
+Jimba.js is designed to be *quiet* when you want performance, and *talkative* when you are debugging. That is why it uses switches.
+
+### 6.1 `opt._O` (logging switch)
+
+If `opt._O = 1`, then `j.log()` prints output.
+If `opt._O = 0`, then `j.log()` does nothing.
+
+This is important because it means you can leave `j.log()` in your code, but disable it in production.
+
+### 6.2 `opt._T` (testing switch)
+
+If `opt._T = 1`, then tests like:
+
+```js
+j.test("Suite", "something", value).num();
+```
+
+will print PASS or FAIL results.
+
+If `opt._T = 0`, tests will not print.
+
+### 6.3 `opt._FailsOnly` (silence PASS output)
+
+When `opt._FailsOnly = 1`, Jimba.js still checks tests, but it only prints FAIL results. PASS results are hidden.
+
+This is useful when you run many tests and only want to see problems.
+
+
+## 7. Logging values with `j.log()` (INFO output)
+
+### 7.1 What `j.log()` is for
+
+`j.log()` is used when you want to *see what a value looks like at runtime*. This is similar to `console.log()`, but Jimba prints it in a consistent one-line format:
+
+```
+INFO { varb: 89 } at jimba.html:81:5
+```
+
+### 7.2 Example
+
+```js
+opt._O = 1;
+
+const varb = 89;
+j.log({ varb });
+```
+
+This prints one line, showing:
+
+1. The word INFO
+2. The object you logged
+3. The file and line where it happened
+
+This makes debugging easier because you can jump directly to the location.
+
+
+## 8. Testing values with `j.test()` (PASS/FAIL output)
+
+### 8.1 Why `j.test()` exists
+
+When you write code, you usually *assume* values are correct. For example, you might assume a calculation returns a number, or assume a result is positive.
+
+Sometimes those assumptions break when someone changes code later. `j.test()` lets you turn your assumptions into small checks.
+
+### 8.2 How `j.test()` works
+
+This is the structure:
+
+```js
+j.test(title, fTitle, actual).someAssertion();
+```
+
+* `title` is the group name (like “comput” or “Login”).
+* `fTitle` is a human sentence describing what you expect.
+* `actual` is the value you are testing.
+
+Then you call an assertion method such as `.num()` or `.pos()`.
+
+### 8.3 Example
+
+```js
+opt._T = 1;
+
+const sum = 5 + 7;
+j.test("Math", "sum must be a number", sum).num();
+```
+
+If `sum` is a number, you will see:
+
+* A green PASS badge line.
+
+If not, you will see:
+
+* A red FAIL badge line.
+
+
+## 9. Understanding assertion methods (no assumptions)
+
+An “assertion” is a check that confirms something is true.
+
+For example:
+
+* `.num()` means “this value must be a number”.
+* `.neg()` means “this value must be negative”.
+
+Here is what some common ones mean in plain English:
+
+* `.num()` checks `typeof value === "number"`.
+* `.string()` checks `typeof value === "string"`.
+* `.pos()` checks the number is `>= 0`.
+* `.neg()` checks the number is `< 0`.
+* `.geq(0)` checks the number is `>= 0`.
+* `.range(10, 20)` checks it is between 10 and 20.
+
+So when you write:
+
+```js
+j.test("Account", "balance must never be negative", balance).geq(0);
+```
+
+You are turning a business rule into a test.
+
+
+## 10. Using `j.check()` for simple equality checks
+
+Sometimes you just want a quick “expected vs actual” check. That is what `j.check()` does.
+
+Example:
+
+```js
+opt._T = 1;
+
+const answer = 2 + 2;
+j.check("Math", answer, 4);
+```
+
+If the answer is 4, it prints PASS.
+If it is not 4, it prints FAIL.
+
+
+## 11. Profiling function time with `j.s()` and `j.e()`
+
+Performance profiling means measuring time. Jimba uses:
+
+* `j.s("label")` to start measuring
+* `j.e("label")` to stop measuring and print duration
+
+Example:
+
+```js
+opt._F = 1;
+
+function slowTask() {
+  j.s("slowTask");
+  for (let i = 0; i < 1000000; i++) {}
+  j.e("slowTask");
 }
-
-const testPack = (async()=>{    
-  //01
-     const rname = j.lowerC(10); //generate randome lower case strings
-     const rnameC = rname.charAt(0).toUpperCase() + rname.slice(1); // capitalize first letter
-     j.test("Group A Unit Tests",'discodancers',discodancers(rnameC)).string();  
-  //02
-     j.test("Group A","cNulls Function tested",cNulls()).null();
-  //03
-    const fn1 = lowerC(6), fn2 = lowerC(6)
-    j.test("Group A","concateNames",concateNames(fn1, fn2)).length(12)
-
-});  
-     
- jtrics(testPack)
-
- Outputs
-
-j.js:115 : jTESTING Home :>: cNulls
-j.js:952 ✓ PASS : ,,,0,[object Object],[object Object],0,0,[object Object],[object Object] :>>: array
-j.js:1232 117 :  : jtest TESTING concateNames
-j.js:1267 ✓ PASS : 15
-j.js:1195 118 : jTESTING Home :>: concateNames
-j.js:952 ✓ PASS : 15 :>>: 15
-j.js:1171 X FAIL 
+slowTask();
 ```
-### 7. Matchers Functions
-Matchers functions include:
-- between
-- eq
-- geq
-- lt
-- leq
-- gt
-- string()
-- object()
-- bool()
-- array()
-  
-### 8. Function Speed Measurement
-Function or block of code speed measurement using `tS()` and `tE()`. Example:
 
-```javascript
-tS("hi");
-// block of code being measured for speed
-tE("hi");
+This prints how many milliseconds the function took.
+
+
+## 12. Counting how many times functions run with `_FUNCTIONS`
+
+Every time you call `j.s("myFunc")`, Jimba increments a counter in:
+
+```js
+opt._FUNCTIONS
 ```
-This will produces the time hi ---ms. All functions marked with tS() and tE() will also show how many times they are being called.
 
-When testing a developer needs random value generators. They are sometimes called arbitrary value generators. 
-Jimba comes with functions that does these. Jimba brings these functions as members of an object called gRValue.
-Below is a list of arbitrary value generators and their default parameters
+So if `comput()` runs 40 times, you might see:
+
+```js
+{ comput: 40, complex: 40 }
 ```
-1. gRValue.gNo:(min=opt._Min, max=opt._Max)
-2. gRValue.gBool:(len=1)
-3. gRValue.gNull:(n=1)
-4. gRValue.chrs:(len=10)
-5. gRValue.upperC:(length=10)
-6. gRValue.lowerC:(length=10)
-7. gRValue.digts:(length=10)
-8. gRValue.symbls:(len=10)
+
+This is helpful when you are debugging loops and want to confirm how many times something executed.
+
+
+## 13. Repeating tests with `j.rTP()` and `j.trics()`
+
+### 13.1 Why repeat tests?
+
+Some bugs only appear for certain random values. If you only test with one example, you may miss the bug.
+
+That is why Jimba supports “repeat tests” using random values.
+
+### 13.2 `j.rTP(fn, n)`
+
+Runs the same function `n` times.
+
+### 13.3 `j.trics(fn, n)`
+
+Runs the function `n` times and then prints summaries like total fails and passes.
+
+This gives you a simple entry into property-style testing: you test your logic under many different inputs.
+
+
+## 14. Using Jimba’s random generators
+
+Jimba includes helper generators so you can produce test values quickly.
+
+Examples:
+
+```js
+const a = j.gNo(-10, 10);   // random integer
+const b = j.gANo(0, 1);     // random float
+const flags = j.gBool(5);   // 5 random booleans
+const s = j.upperC(8);      // random uppercase string length 8
 ```
-examples of using the above are : also see how to add 4th parameter to jj() functions e.g. jj("Home","Testing ",gBool.length,"eq(10)","10"), i.e. eq(10)
-, "between(-3,4)", "gt(10)", "lt(0)","string()", other methods are listed under ###7 match makers.
+
+These are designed to reduce the time it takes to create many test cases.
+
+
+## 15. Complete beginner example (copy/paste)
+
+```js
+import { opt, j } from "./jimba.js";
+
+opt._O = 1;
+opt._T = 1;
+opt._FailsOnly = 0;
+
+const name = "joe";
+j.log({ name });
+j.test("User", "name must be a string", name).string();
+
+const total = 10 + 20;
+j.test("Math", "total must be positive", total).pos();
 ```
-9. const num = gRValue.gNo(gRValue.gNo(),gRValue.gNo()); jj("Home","Number is between -10 and 10",num,"between(-3,4)","positive no")
-10. const gBool = gRValue.gBool(gRValue.gNo()); jj("Home","create 10 bools ",gBool.length,"eq(10)","10")   
-11. const gNull = gRValue.gNull(gRValue.gNo()); jj("Home","create no less or equal to 1",gNull.length,"leq(1)")
-12. const gt = gRValue.gNo(); jj("Home","create number greater than 10",gt,"gt(10)","no > 10")
-13. const lt = gRValue.gNull(); jj("Home","create number less than 1",lt.length,"lt(0)","lt length")  
-14. const chrs = gRValue.chrs(90); jtest("chrs",chrs,'kmjnh')
-15. const upperC_ = gRValue.upperC(60); jtest("chrs",upperC_,'kmjnh')
-16. const lowerC = gRValue.lowerC(6); jtest("chrs",lowerC,'kmjnh');jj("Home","lowerC",lowerC,"eq('abcd')")
-17. const digts = gRValue.digts(9); jj("Home","Number iwith 9 digits",digts,"string()")
-18. const symbls = gRValue.symbls(70); jj("Home","70 chars",symbls,"string()")
+
+
+## 16. The “comput/complex” example explained line-by-line
+
+Here is a simplified explanation of what your code is doing.
+
+1. The function starts by calling `j.s("comput")`. This increments the call counter and starts timing if profiling is enabled.
+2. It calculates `sum`. Immediately after calculating, it tests `sum` to ensure it is a number.
+3. It calculates `sqr = sum * sum`. Then it tests whether `sqr` is negative or non-negative, depending on what you expect.
+4. It continues step-by-step, testing each computed value as soon as it is created.
+5. The function ends by calling `j.e("comput")`, which stops profiling and prints timing.
+
+This style is powerful because it “guards” every step of your computation. If anything changes, you will see exactly which step first became wrong.
+
+
+## 17. Reading the console output like a professional
+
+When you see:
+
+* **INFO** lines: those are from `j.log()`
+* **✓ PASS** lines: those are passing test assertions
+* **✗ FAIL** lines: those are failing test assertions
+
+If you turn on `_FailsOnly`, you will mostly see only fails, which makes debugging faster when many tests pass.
+
+
+## 18. Common mistakes and how to fix them
+
+### 18.1 “Nothing prints”
+
+Usually this means you forgot:
+
+```js
+opt._T = 1; // for tests
+opt._O = 1; // for logs
 ```
-Thorough testing of jimba is still going on and anyone is invited to try it and give feedback. Installing as npm i jimba will install the latest version. Should one face errors of dependence issues then one needs to install it like this npm i jimba --force
 
-### 9. Feedback and Contact
-For feedback or inquiries about this library, please contact:
-- cto@wims.io
-- besi@tobb.co.za
+### 18.2 “Tests show the wrong file/line”
+
+This can happen if your environment changes stack traces or runs inside bundled code. Jimba uses stack parsing, so bundlers can affect it.
 
 
+## 19. Frameworks and environments that can use Jimba.js
+
+Jimba.js is simple and has no dependencies, so it can be used in many environments.
+
+### Front-end (browser)
+
+* Vanilla JavaScript/HTML projects
+* Vite projects (React, Vue, Svelte, Solid, Preact)
+* Next.js (client-side parts)
+* Nuxt (client-side parts)
+* Angular (client-side debugging/testing)
+* Remix (client-side parts)
+
+### Back-end (Node.js)
+
+* Node.js scripts and services
+* Express / Fastify / Koa APIs
+* NestJS (Node runtime)
+* Server-side jobs and CLI tools
+
+You can also use Jimba alongside Jest/Mocha/Vitest, but Jimba is best when you want fast, inline checks while coding.
 
 
+## 20. API reference (short)
+
+* `j.log({x})` prints INFO
+* `j.test("suite","description",value).num()` prints PASS/FAIL
+* `j.check("title", actual, expected)` prints PASS/FAIL
+* `j.s("label")` and `j.e("label")` profile timing
+* `j.trics(fn)` repeats a test pack many times and prints totals
+
+
+## 21. Glossary of terms
+
+**Assertion**: A check that confirms something is true (example: “must be a number”).
+**Badge**: The colored label like “✓ PASS” or “✗ FAIL” in the console.
+**Callsite**: The file name and line number where a log or test was triggered.
+**Context (`ctx`)**: Internal information Jimba stores so it can show suite name, expression, and location.
+**Framework**: A library that structures how you build applications (React, Vue, Angular, etc.).
+**Inline test**: A test placed right next to the code it checks.
+**Profiling**: Measuring how long code takes to run.
+**Property-style testing**: Running the same test many times with different random inputs.
+**Suite**: A group name for tests (example: `"comput"`).
+**Toggle / switch**: A setting like `opt._T` that turns a feature on or off.

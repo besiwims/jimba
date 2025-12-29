@@ -58,33 +58,53 @@ var opt = {
   //collects all profiled functions
 };
 var j = {
-  log: (o) => {
-    if (opt._O === 1 || opt._R === 1) {
-      try {
-        if (o == null || o == void 0 || o == 0 || o == "") {
-          console.info("%cX FAIL ", "background-color:darkred;color:#fff;");
-          opt.TOTAL_FAIL++;
-          if (opt._M === 1) {
-            console.info(o);
-          }
-        } else {
-          if (typeof o == "object" && o != null) {
-            const name = Object.keys(o);
-            const val = Object.values(o);
-            if (val == "" || val == 0 || val == "null" || val == "undefined" || val == [""]) {
-              console.info("%cX FAIL ", "background-color:darkred;color:#fff;");
-              opt.TOTAL_FAIL++;
+  log: (o, stop = false) => {
+    if (!stop) {
+      if (opt._O === 1 || opt._R === 1) {
+        try {
+          if (o == null || o == void 0 || o == 0 || o == "") {
+            console.info("%cX FAIL ", "background-color:darkred;color:#fff;");
+            opt.TOTAL_FAIL++;
+            if (opt._M === 1) {
               console.info(o);
-            } else {
-              if (opt._FailsOnly === 0) {
-                const nesteddValue_ = Object.values(o);
-                if (nesteddValue_) {
-                  const nesteddValue = Object.values(nesteddValue_);
-                  if (typeof Object.values(nesteddValue) == Number) {
-                    return;
-                  }
-                  const st = JSON.stringify(Object.values(nesteddValue));
-                  if (!(st === "[{}]")) {
+            }
+          } else {
+            if (typeof o == "object" && o != null) {
+              const name = Object.keys(o);
+              const val = Object.values(o);
+              if (val == "" || val == 0 || val == "null" || val == "undefined" || val == [""]) {
+                console.info("%cX FAIL ", "background-color:darkred;color:#fff;");
+                opt.TOTAL_FAIL++;
+                if (opt._M === 1) {
+                  console.trace(o);
+                }
+              } else {
+                if (opt._FailsOnly === 0) {
+                  const nesteddValue_ = Object.values(o);
+                  if (nesteddValue_) {
+                    const nesteddValue = Object.values(nesteddValue_);
+                    if (typeof Object.values(nesteddValue) == Number) {
+                      return;
+                    }
+                    const st = JSON.stringify(Object.values(nesteddValue));
+                    if (!(st === "[{}]")) {
+                      console.info("%c\u2713 PASS ", "background-color:darkgreen;color:#fff;");
+                      opt.TOTAL_PASS++;
+                      if (opt._M) {
+                        console.trace(o);
+                      } else {
+                        console.info(o);
+                      }
+                    } else {
+                      console.info("%cX FAIL ", "background-color:darkred;color:#fff;");
+                      opt.TOTAL_FAIL++;
+                      if (opt._M) {
+                        console.trace(o);
+                      } else {
+                        console.info(o);
+                      }
+                    }
+                  } else {
                     console.info("%c\u2713 PASS ", "background-color:darkgreen;color:#fff;");
                     opt.TOTAL_PASS++;
                     if (opt._M) {
@@ -92,55 +112,39 @@ var j = {
                     } else {
                       console.info(o);
                     }
-                  } else {
-                    console.info("%cX FAIL ", "background-color:darkred;color:#fff;");
-                    opt.TOTAL_FAIL++;
-                    if (opt._M) {
-                      console.trace(o);
-                    } else {
-                      console.info(o);
-                    }
                   }
-                } else {
-                  console.info("%c\u2713 PASS ", "background-color:darkgreen;color:#fff;");
-                  opt.TOTAL_PASS++;
-                  if (opt._M) {
-                    console.trace(o);
-                  } else {
-                    console.info(o);
-                  }
-                }
-              }
-            }
-          } else {
-            if (typeof o == "number" && o > 0 || typeof o == "boolean" && o == true || typeof o == "string" && o.trim().length > 0) {
-              if (opt._FailsOnly === 0) {
-                console.info("%c\u2713 PASS ", "background-color:darkgreen;color:#fff;");
-                opt.TOTAL_PASS++;
-                if (opt._M === 1) {
-                  console.info(o);
                 }
               }
             } else {
-              console.info("%cX FAIL ", "background-color:darkred;color:#fff;");
-              opt.TOTAL_FAIL++;
-              if (opt._M) {
-                console.trace(o);
+              if (typeof o == "number" && o > 0 || typeof o == "boolean" && o == true || typeof o == "string" && o.trim().length > 0) {
+                if (opt._FailsOnly === 0) {
+                  console.info("%c\u2713 PASS ", "background-color:darkgreen;color:#fff;");
+                  opt.TOTAL_PASS++;
+                  if (opt._M === 1) {
+                    console.info(o);
+                  }
+                }
+              } else {
+                console.info("%cX FAIL ", "background-color:darkred;color:#fff;");
+                opt.TOTAL_FAIL++;
+                if (opt._M) {
+                  console.trace(o);
+                }
               }
             }
           }
+        } catch (error) {
+          console.info("%cX FAIL ", "background-color:darkred;color:#fff;");
+          opt.TOTAL_FAIL++;
+          console.error(error);
         }
-      } catch (error) {
-        console.info("%cX FAIL ", "background-color:darkred;color:#fff;");
-        opt.TOTAL_FAIL++;
-        console.error(error);
+      } else {
       }
-    } else {
     }
   },
-  test: (title, fTitle, actual, k2 = 0) => {
+  test: (title, fTitle, actual, k = 0) => {
     try {
-      if (opt._T === 1 || opt._R === 1 || !(k2 === 0)) {
+      if (opt._T === 1 || opt._R === 1 || !(k === 0)) {
         const trackcalls = opt._Tc++ + " : ";
         if (opt._FailsOnly === 1) {
         } else {
@@ -154,7 +158,7 @@ var j = {
       console.log(error.message);
     }
   },
-  check: (title, varString, expectedAnswer, k2 = 0) => {
+  check: (title, varString, expectedAnswer, k = 0) => {
     const trackcalls = opt._Tc++ + " : ";
     const tBallConsole = "%c" + trackcalls + " : jcheck " + title;
     const cssBlue = "background-color:#fff;color:blue;";
@@ -172,7 +176,7 @@ var j = {
       }
     }
     opt.TOTAL_TESTS_RUN++;
-    if (opt._R || k2 !== 0 || opt._T == 1) {
+    if (opt._R || k !== 0 || opt._T == 1) {
       typeof varString === "string";
       if (opt._FailsOnly === 1) {
       } else {
@@ -262,21 +266,21 @@ var j = {
     } else {
     }
   },
-  s: (label, k2 = 0) => {
-    if (!(k2 == 0)) {
+  s: (label, k = 0) => {
+    if (!(k == 0)) {
       opt.tS_ = true;
     }
-    if (label && (opt._F || opt._R || !(k2 == 0))) {
+    if (label && (opt._F || opt._R || !(k == 0))) {
       opt._FUNCTIONS.push(label);
       console.log("%cFunc starts : " + opt._FUNCTIONS, "background-color:#fff;color:purple;");
       console.time("TIME : " + label);
     }
   },
-  e: (label, k2 = 0) => {
-    if (!(k2 == 0)) {
+  e: (label, k = 0) => {
+    if (!(k == 0)) {
       opt.tS_ = true;
     }
-    if (label && (opt._F || opt._R || !(k2 == 0))) {
+    if (label && (opt._F || opt._R || !(k == 0))) {
       opt._FUNCTIONS.push(label);
       console.log("%cFunc ends : " + opt._FUNCTIONS, "background-color:#fff;color:purple;");
       console.timeEnd("TIME : " + label);
@@ -287,15 +291,15 @@ var j = {
       fn();
     }
   },
-  trics: (fn, n = opt._tNo, k2 = 0) => {
+  trics: (fn, n = opt._tNo, k = 0) => {
     if (fn != null && typeof fn === "function") {
       for (let i = 0; i < n; i++) {
         fn();
       }
     }
-    passes(k2), fails(k2);
-    funcs(k2);
-    tests(k2);
+    passes(k), fails(k);
+    funcs(k);
+    tests(k);
   },
   hexR: () => {
     let n = (Math.random() * 1048575 * 1e6).toString(16);
@@ -360,6 +364,9 @@ var j = {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_?|[]{}:",.!@#$%^&*()+~`';
     return charProcess(characters, len);
   },
+  id: () => {
+    return self.crypto.randomUUID().replace("-", "").replace("-", "").replace("-", "").replace("-", "").toUpperCase();
+  },
   upperC: (length = 10) => {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     return charProcess(characters, length);
@@ -377,42 +384,42 @@ var j = {
     return charProcess(characters, len);
   }
 };
-function fails(k2 = 0) {
-  if (opt._O || opt._T == 1 || opt._R || !(k2 == 0)) {
+function fails(k = 0) {
+  if (opt._O || opt._T == 1 || opt._R || !(k == 0)) {
     if (opt.TOTAL_FAIL > 0) {
       console.log("%cTOTAL_ERRORS : " + opt.TOTAL_FAIL, "background-color:#fff;color:darkred;");
     }
   }
 }
-function passes(k2 = 0) {
-  if (opt._O || opt._T == 1 || opt._R || !(k2 == 0)) {
+function passes(k = 0) {
+  if (opt._O || opt._T == 1 || opt._R || !(k == 0)) {
     if (opt.TOTAL_PASS > 0) {
       console.log("%cTOTAL_PASSES : " + opt.TOTAL_PASS, "background-color:#fff;color:blue;");
     }
   }
 }
-function funcs(k2 = 0) {
-  if ((opt.O || opt._T == 1 || opt._R || opt.tS) && (!(k2 == 0) || opt._FUNCTIONS.length > 0)) {
+function funcs(k = 0) {
+  if ((opt.O || opt._T == 1 || opt._R || opt.tS) && (!(k == 0) || opt._FUNCTIONS.length > 0)) {
     const fT = opt._FUNCTIONS.length;
     console.log("%cTOTAL_FUNCTIONS : " + fT, "background-color:#fff;color:purple;");
     const funcs_ = opt._FUNCTIONS.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), /* @__PURE__ */ Object.create(null));
     console.log(funcs_);
   }
 }
-function tests(k2 = 0) {
+function tests(k = 0) {
   if (opt.T == 1) {
     opt.tS = false;
   }
-  if ((opt.T == 1 || opt._R || opt.tS) && (!(k2 == 0) || opt.TOTAL_TESTS_PASS > 0)) {
+  if ((opt.T == 1 || opt._R || opt.tS) && (!(k == 0) || opt.TOTAL_TESTS_PASS > 0)) {
     console.log("%cTOTAL_TESTS_PASS : " + opt.TOTAL_TESTS_PASS, "background-color:blue;color:#fff;");
   }
-  if ((opt.T == 1 || opt._R || opt.tS) && (!(k2 == 0) || opt.TOTAL_TESTS_FAIL > 0)) {
+  if ((opt.T == 1 || opt._R || opt.tS) && (!(k == 0) || opt.TOTAL_TESTS_FAIL > 0)) {
     console.log("%cTOTAL_TESTS_FAIL : " + opt.TOTAL_TESTS_FAIL, "background-color:darkred;color:#fff;");
   }
-  if ((opt.T == 1 || opt._R || opt.tS) && (!(k2 == 0) || opt.TOTAL_TESTS_RUN > 0)) {
+  if ((opt.T == 1 || opt._R || opt.tS) && (!(k == 0) || opt.TOTAL_TESTS_RUN > 0)) {
     console.log("%cTOTAL_TESTS_RUN : " + opt.TOTAL_TESTS_RUN, "background-color:blue;color:#fff;");
   }
-  if ((opt.T == 1 || opt._R || opt.tS) && (!(k2 == 0) || opt.TOTAL_WRONG_DATA_TYPES_PARAMS > 0)) {
+  if ((opt.T == 1 || opt._R || opt.tS) && (!(k == 0) || opt.TOTAL_WRONG_DATA_TYPES_PARAMS > 0)) {
     console.log("%cTOTAL_WRONG_DATA_TYPES_PARAMS : " + opt.TOTAL_WRONG_DATA_TYPES_PARAMS, "background-color:blue;color:#fff;");
   }
 }
@@ -446,160 +453,161 @@ var compareObjects = (a, b) => {
   }
 };
 var ComparisonMethods = class {
-  constructor(actual, expectedValue = "", k2 = 0) {
+  constructor(actual, expectedValue = "", k = 0) {
     this.actual = actual;
     this.expectedValue = expectedValue;
-    this.k = k2;
+    this.k = k;
   }
-  between(start, end) {
+  between(start, end, k = 0) {
     if (this.actual >= start && this.actual <= end) {
       pass(this.actual, this.expectedValue, k);
     } else {
       fail(this.actual, this.expectedValue, k);
     }
   }
-  eq(expected, k2 = 0) {
+  eq(expected, k = 0) {
     if (expected === this.actual) {
-      pass(this.actual, expected, k2);
+      pass(this.actual, expected, k);
     } else {
-      fail(this.actual, expected, k2);
+      fail(this.actual, expected, k);
     }
   }
-  gt(expected, k2 = 0) {
+  gt(expected, k = 0) {
     if (this.actual > expected) {
-      pass(this.actual, expected, k2);
+      pass(this.actual, expected, k);
     } else {
-      fail(this.actual, expected, k2);
+      fail(this.actual, expected, k);
     }
   }
-  lt(expected, k2 = 0) {
+  lt(expected, k = 0) {
     if (this.actual < expected) {
-      pass(this.actual, expected, k2);
+      pass(this.actual, expected, k);
     } else {
-      fail(this.actual, expected, k2);
+      fail(this.actual, expected, k);
     }
   }
-  geq(expected, k2 = 0) {
+  geq(expected, k = 0) {
     if (this.actual >= expected) {
-      pass(this.actual, expected, k2);
+      pass(this.actual, expected, k);
     } else {
-      fail(this.actual, expected, k2);
+      fail(this.actual, expected, k);
     }
   }
-  leq(expected, k2 = 0) {
+  leq(expected, k = 0) {
     if (expected >= this.actual) {
-      pass(this.actual, expected, k2);
+      pass(this.actual, expected, k);
     } else {
-      fail(this.actual, expected, k2);
+      fail(this.actual, expected, k);
     }
   }
-  contains(expected, k2 = 0) {
+  contains(expected, k = 0) {
     if (this.actual) {
       console.log(this.actual);
       console.log(expected);
       if (this.actual.toString().includes(expected)) {
-        pass(this.actual, "contains " + expected, k2);
+        pass(this.actual, "contains " + expected, k);
       } else {
-        fail(this.actual, "contains " + expected, k2);
+        fail(this.actual, "contains " + expected, k);
       }
     } else {
       const got = this.actual;
       if (typeof got == "undefined") {
-        fail(this.actual, "contains undefined ", k2);
-      } else if (typeof got == "null") {
-        fail(this.actual, "contains null ", k2);
+        fail(this.actual, "contains undefined ", k);
+      } else if (got === "null") {
+        fail(this.actual, "contains null ", k);
       }
     }
   }
-  null(k2 = 0) {
+  null(k = 0) {
     const nulls = [{ empty: null }, { empty: void 0 }, { empty: "null" }, { empty: "undefined" }, , null, void 0, 0, "", "", { empty: [0] }, { empty: "" }, { empty: "" }, { empty: "0" }, { empty: 0 }, { empty: [] }, { empty: {} }, [0], [], [""], [""], {}];
     if (nulls.includes(this.actual)) {
-      pass(this.actual, "null", k2);
+      pass(this.actual, "null", k);
     } else {
-      fail(this.actual, "null", k2);
+      fail(this.actual, "null", k);
     }
   }
-  notNull(k2 = 0) {
+  notNull(k = 0) {
     const nulls = [{ empty: null }, { empty: void 0 }, { empty: "null" }, { empty: "undefined" }, , null, void 0, 0, "", "", { empty: [0] }, { empty: "" }, { empty: "" }, { empty: "0" }, { empty: 0 }, { empty: [] }, { empty: {} }, [0], [], [""], [""], {}];
     if (!nulls.includes(this.actual)) {
-      pass(this.actual, "notNull", k2);
+      pass(this.actual, "notNull", k);
     } else {
-      fail(this.actual, "notNull", k2);
+      fail(this.actual, "notNull", k);
     }
   }
-  object(k2 = 0) {
+  object(k = 0) {
     if ("object" === typeof this.actual) {
-      pass(this.actual, "object", k2);
+      pass(this.actual, "object", k);
     } else {
-      fail(this.actual, "object", k2);
+      fail(this.actual, "object", k);
     }
   }
-  array(k2 = 0) {
+  array(k = 0) {
     if (Array.isArray(this.actual)) {
-      pass(this.actual, "array", k2);
+      pass(this.actual, "array", k);
     } else {
-      fail(this.actual, "array", k2);
+      fail(this.actual, "array", k);
     }
   }
-  neg(k2 = 0) {
+  neg(k = 0) {
     if (this.actual < 0) {
-      pass(this.actual, "negative", k2);
+      pass(this.actual, "negative", k);
     } else {
-      fail(this.actual, "negative", k2);
+      fail(this.actual, "negative", k);
     }
   }
-  pos(k2 = 0) {
+  pos(k = 0) {
     if (this.actual >= 0) {
-      pass(this.actual, "positive", k2);
+      pass(this.actual, "positive", k);
     } else {
-      fail(this.actual, "positive", k2);
+      fail(this.actual, "positive", k);
     }
   }
-  bool(k2 = 0) {
+  bool(k = 0) {
     if (typeof this.actual === "boolean") {
-      pass(this.actual, "bool", k2);
+      pass(this.actual, "bool", k);
     } else {
-      fail(this.actual, "bool", k2);
+      fail(this.actual, "bool", k);
     }
   }
-  notBool(k2 = 0) {
+  notBool(k = 0) {
     if (typeof this.actual != "boolean") {
-      pass(this.actual, "notBool", k2);
+      pass(this.actual, "notBool", k);
     } else {
-      fail(this.actual, "notBool", k2);
+      fail(this.actual, "notBool", k);
     }
   }
-  num(k2 = 0) {
+  num(k = 0) {
     if (typeof this.actual === "number") {
-      pass(this.actual, "num", k2);
+      pass(this.actual, "num", k);
     } else {
-      fail(this.actual, "num", k2);
+      fail(this.actual, "num", k);
     }
   }
-  length(n, k2 = 0) {
-    if (this.actual.length === n) {
-      pass(this.actual.length, "length", k2);
+  dec(k = 0) {
+    const n = this.actual;
+    if (n - Math.floor(n) !== 0) {
+      pass(this.actual, "decimal", k);
     } else {
-      fail(this.actual.length, "length", k2);
+      fail(this.actual, "not a decimal", k);
     }
   }
-  range(min = 0, max = 100, k2 = 0) {
+  range(min = 0, max = 100, k = 0) {
     if (this.actual >= min, this.actual <= max) {
-      pass(this.actual, "range pass", k2);
+      pass(this.actual, "range pass", k);
     } else {
-      fail(this.actual, "range fail", k2);
+      fail(this.actual, "range fail", k);
     }
   }
-  string(k2 = 0) {
+  string(k = 0) {
     if (typeof this.actual === "string") {
-      pass(this.actual, "string", k2);
+      pass(this.actual, "string", k);
     } else {
-      fail(this.actual, "string", k2);
+      fail(this.actual, "string", k);
     }
   }
 };
-function pass(exp, expectedValue, k2) {
-  if (opt._R === 1 || k2 !== 0 || opt._T === 1) {
+function pass(exp, expectedValue, k) {
+  if (opt._R === 1 || k !== 0 || opt._T === 1) {
     if (opt._FailsOnly === 0) {
       const trackcalls = opt._Tc++ + " : ";
       console.log("%c\u2713 PASS : " + exp + " :>>: " + expectedValue, "background-color:#fff;color:green;");
@@ -611,9 +619,10 @@ function pass(exp, expectedValue, k2) {
     }
   }
 }
-function fail(exp, expectedValue, k2) {
-  if (opt._FailsOnly === 1 || opt._R || k2 !== 0 || opt._T == 1) {
+function fail(exp, expectedValue, k) {
+  if (opt._FailsOnly === 1 || opt._R || k !== 0 || opt._T == 1) {
     const trackcalls = opt._Tc++ + " : ";
+    console.log("%c" + trackcalls + "jTESTING FAIL :>: expecting " + expectedValue, "background-color:#fff;color:purple;");
     console.log("%cX FAIL : " + exp + " :>>: " + expectedValue, "background-color:#fff;color:red;");
     opt.TOTAL_FAIL++;
     opt.TOTAL_TESTS_FAIL++;
